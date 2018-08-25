@@ -5,6 +5,19 @@ import (
 	"math/rand"
 )
 
+type sortable interface {
+	length() int
+	less(i, j int) bool
+	swap(i, j int)
+}
+
+type person struct {
+	first string
+	last  string
+}
+
+type people []person
+
 func main() {
 	A := randomSlice(25)
 	B := copySlice(A)
@@ -12,6 +25,29 @@ func main() {
 	fmt.Println(mergeSort(A, 0, len(A)-1))
 	fmt.Println("B:", B)
 	fmt.Println(quickSort(B, 0, len(B)-1))
+	ppl := people{
+		person{first: "e", last: "E"},
+		person{first: "b", last: "B"},
+		person{first: "c", last: "C"},
+		person{first: "a", last: "A"},
+		person{first: "d", last: "D"},
+	}
+	fmt.Println(experBubbleSort(ppl))
+}
+
+func (ppl people) length() (length int) {
+	return len(ppl)
+}
+
+func (ppl people) less(i, j int) (less bool) {
+	if ppl[i].last < ppl[j].last {
+		less = true
+	}
+	return less
+}
+
+func (ppl people) swap(i, j int) {
+	ppl[i], ppl[j] = ppl[j], ppl[i]
 }
 
 func mergeSort(A []int, a, b int) []int {
@@ -134,4 +170,20 @@ func copySlice(A []int) (B []int) {
 		B[i] = a
 	}
 	return B
+}
+
+func experBubbleSort(A sortable) sortable {
+	c := true
+	m := A.length()
+	for c {
+		c = false
+		for i := 0; i+1 < m; i++ {
+			if A.less(i+1, i) {
+				A.swap(i, i+1)
+				c = true
+			}
+		}
+		m--
+	}
+	return A
 }
