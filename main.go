@@ -5,17 +5,20 @@ import (
 	"math/rand"
 )
 
+// sortable data can be sorted using GoSort methods.
 type sortable interface {
-	length() int
-	less(i, j int) bool
-	swap(i, j int)
+	length() int        // Number of items to be sorted
+	less(i, j int) bool // Less than condition for item comparison
+	swap(i, j int)      // Swaps two items
 }
 
+// person is a first and last name collection.
 type person struct {
 	first string
 	last  string
 }
 
+// people is a collection of persons.
 type people []person
 
 func main() {
@@ -25,14 +28,21 @@ func main() {
 	fmt.Println(mergeSort(A, 0, len(A)-1))
 	fmt.Println("B:", B)
 	fmt.Println(quickSort(B, 0, len(B)-1))
-	ppl := people{
-		person{first: "e", last: "E"},
-		person{first: "b", last: "B"},
-		person{first: "c", last: "C"},
-		person{first: "a", last: "A"},
-		person{first: "d", last: "D"},
+
+	n := 10
+	alphabet := "abcdefghijklmnopqrstuvwxyz"
+	ppl := make(people, n) // or people{}
+	for i := 0; i < n; i++ {
+		ppl[i] = person{
+			first: charAt(rand.Intn(len(alphabet)), alphabet),
+			last:  charAt(rand.Intn(len(alphabet)), alphabet),
+		}
 	}
 	fmt.Println(experBubbleSort(ppl))
+}
+
+func charAt(i int, key string) (s string) {
+	return string(key[i%len(key)])
 }
 
 func (ppl people) length() (length int) {
