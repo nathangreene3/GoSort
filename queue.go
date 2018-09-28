@@ -3,34 +3,21 @@ package main
 import "fmt"
 
 type queue struct {
-	count    int
-	capacity int
-	heap     []comparable
-}
-
-type comparable interface {
-	less(v comparable) bool
-}
-
-type comparableInt int
-
-func (i comparableInt) less(j comparableInt) (less bool) {
-	if i < j {
-		less = true
-	}
-	return less
+	count    int      // Number of items in the queue
+	capacity int      // Maximum number of items able to be held in the queue
+	heap     sortable // Ordered list of sortable items
 }
 
 func newQueue(capacity int) (q queue) {
 	if 0 < capacity {
 		q.count = 0
 		q.capacity = capacity
-		q.heap = make([]comparable, capacity+1)
+		q.heap = make(sortable, capacity+1)
 	}
 	return q
 }
 
-func (q queue) enqueue(item comparable) {
+func (q queue) enqueue(item sortable) {
 	if q.count < q.capacity {
 		q.count++
 		q.heap[q.count] = item
@@ -38,7 +25,7 @@ func (q queue) enqueue(item comparable) {
 	}
 }
 
-func (q queue) dequeue() (item comparable) {
+func (q queue) dequeue() (item sortable) {
 	if 0 < q.count {
 		item = q.heap[1]
 		q.heap[1] = q.heap[q.count]
