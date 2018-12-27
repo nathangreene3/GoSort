@@ -2,33 +2,33 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	srt "sort"
+	"time"
 )
 
 func main() {
-	A := randomSlice(10)
-	// B := copySlice(A)
-	// C := copySlice(A)
-	D := intSlice(copySlice(A))
-	// fmt.Println("A before mergeSort:", A)
-	// fmt.Println("A after mergeSort: ", mergeSort(A, 0, len(A)-1))
-	// fmt.Println("B before quickSort:", B)
-	// fmt.Println("B after quickSort: ", quickSort(B, 0, len(B)-1))
-	// fmt.Println("C before insertionSort:", C)
-	// fmt.Println("C after insertionSort: ", insertionSort(C))
-
-	// n := 10
-	// alphabet := "abcdefghijklmnopqrstuvwxyz"
-	// ppl := make(people, n) // or people{}
-	// for i := 0; i < n; i++ {
-	// 	ppl[i] = person{
-	// 		first: charAt(rand.Intn(len(alphabet)), alphabet),
-	// 		last:  charAt(rand.Intn(len(alphabet)), alphabet),
-	// 	}
+	rand.Seed(int64(time.Now().Nanosecond()))
+	srt.Sort(nil)
+	// A := people{
+	// 	&person{"", "a"},
+	// 	&person{"", "b"},
+	// 	&person{"", "c"},
+	// 	&person{"", "d"},
+	// 	&person{"", "e"},
+	// 	&person{"", "f"},
+	// 	&person{"", "g"},
+	// 	&person{"", "h"},
+	// 	&person{"", "i"},
+	// 	&person{"", "j"},
 	// }
-	// fmt.Println(bubbleSortable(ppl))
-	fmt.Println(bubbleSortable(D))
-	q := newQueue(5)
-	for i := 0; i < 5; i++ {
-		q.enqueue(comparableInt(i))
-	}
+	// A.randomize()
+	// fmt.Println(A.String())
+	// quickSortable(A, 0, A.length()-1)
+	// fmt.Printf("%v\n", A)
+
+	A := randomIntSlice(10)
+	fmt.Println(A)
+	quickSortable(A, 0, A.length()-1)
+	fmt.Println(A)
 }
