@@ -11,21 +11,17 @@ func BenchmarkBubbleSortable(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedIntSlice(10), 10},
-		{reversedIntSlice(100), 100},
-		{reversedIntSlice(1000), 1000},
-		{reversedIntSlice(10000), 10000},
+		{mostUnsortedIntSlice(10), 10},
+		{mostUnsortedIntSlice(100), 100},
+		{mostUnsortedIntSlice(1000), 1000},
+		{mostUnsortedIntSlice(10000), 10000},
 	}
-	var c intSlice
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("BubbleSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					bubbleSortable(c)
+					bubbleSortable(copyIntSlice(data[i].test))
 				}
 			},
 		)
@@ -37,21 +33,17 @@ func BenchmarkInsertionSortable(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedIntSlice(10), 10},
-		{reversedIntSlice(100), 100},
-		{reversedIntSlice(1000), 1000},
-		{reversedIntSlice(10000), 10000},
+		{mostUnsortedIntSlice(10), 10},
+		{mostUnsortedIntSlice(100), 100},
+		{mostUnsortedIntSlice(1000), 1000},
+		{mostUnsortedIntSlice(10000), 10000},
 	}
-	var c intSlice
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("InsertionSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					insertionSortable(c)
+					insertionSortable(copyIntSlice(data[i].test))
 				}
 			},
 		)
@@ -63,21 +55,17 @@ func BenchmarkQuickSortable(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedIntSlice(10), 10},
-		{reversedIntSlice(100), 100},
-		{reversedIntSlice(1000), 1000},
-		{reversedIntSlice(10000), 10000},
+		{mostUnsortedIntSlice(10), 10},
+		{mostUnsortedIntSlice(100), 100},
+		{mostUnsortedIntSlice(1000), 1000},
+		{mostUnsortedIntSlice(10000), 10000},
 	}
-	var c intSlice
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("QuickSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					quickSortable(c, 0, data[i].size-1)
+					quickSortable(copyIntSlice(data[i].test), 0, data[i].size-1)
 				}
 			},
 		)
@@ -89,21 +77,17 @@ func BenchmarkBubbleSort(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedSlice(10), 10},
-		{reversedSlice(100), 100},
-		{reversedSlice(1000), 1000},
-		{reversedSlice(10000), 10000},
+		{mostUnsortedSlice(10), 10},
+		{mostUnsortedSlice(100), 100},
+		{mostUnsortedSlice(1000), 1000},
+		{mostUnsortedSlice(10000), 10000},
 	}
-	var c []int
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("BubbleSort on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copySlice(data[i].test)
-					b1.StartTimer()
-					bubbleSort(c)
+					bubbleSort(copyIntSlice(data[i].test))
 				}
 			},
 		)
@@ -115,21 +99,17 @@ func BenchmarkInsertionSort(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedSlice(10), 10},
-		{reversedSlice(100), 100},
-		{reversedSlice(1000), 1000},
-		{reversedSlice(10000), 10000},
+		{mostUnsortedSlice(10), 10},
+		{mostUnsortedSlice(100), 100},
+		{mostUnsortedSlice(1000), 1000},
+		{mostUnsortedSlice(10000), 10000},
 	}
-	var c []int
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("InsertionSort on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					insertionSort(c)
+					insertionSort(copyIntSlice(data[i].test))
 				}
 			},
 		)
@@ -141,21 +121,17 @@ func BenchmarkQuickSort(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedSlice(10), 10},
-		{reversedSlice(100), 100},
-		{reversedSlice(1000), 1000},
-		{reversedSlice(10000), 10000},
+		{mostUnsortedSlice(10), 10},
+		{mostUnsortedSlice(100), 100},
+		{mostUnsortedSlice(1000), 1000},
+		{mostUnsortedSlice(10000), 10000},
 	}
-	var c []int
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("QuickSort on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					quickSort(c, 0, data[i].size-1)
+					quickSort(copyIntSlice(data[i].test), 0, data[i].size-1)
 				}
 			},
 		)
@@ -167,21 +143,17 @@ func BenchmarkGosSort(b0 *testing.B) {
 		test intSlice
 		size int
 	}{
-		{reversedSlice(10), 10},
-		{reversedSlice(100), 100},
-		{reversedSlice(1000), 1000},
-		{reversedSlice(10000), 10000},
+		{mostUnsortedSlice(10), 10},
+		{mostUnsortedSlice(100), 100},
+		{mostUnsortedSlice(1000), 1000},
+		{mostUnsortedSlice(10000), 10000},
 	}
-	var c []int
 	for i := range data {
 		b0.Run(
 			fmt.Sprintf("GosSort on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					b1.StopTimer()
-					c = copyIntSlice(data[i].test)
-					b1.StartTimer()
-					srt.Ints(c)
+					srt.Ints(copyIntSlice(data[i].test))
 				}
 			},
 		)

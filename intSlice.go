@@ -1,6 +1,10 @@
 package main
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+	"sort"
+)
 
 type intSlice []int
 
@@ -297,4 +301,70 @@ func randomIntSlice(n int) intSlice {
 		rand.Shuffle(n, func(i, j int) { A.swap(i, j) })
 	}
 	return A
+}
+
+func mostUnsortedIntSlice(n int) intSlice {
+	A := newIntSlice(n)
+	return append(A[n/2:], A[:n/2]...)
+}
+
+func nextSlice(p []int) []int {
+	n := len(p)
+	k := -1
+	for i := n - 2; 0 <= i; i-- {
+		if p[i] < p[i+1] {
+			k = i
+			break
+		}
+	}
+	if k == -1 {
+		return newSlice(n)
+	}
+	j := -1
+	for i := n - 1; k < i; i-- { // 0 <= k < n-1
+		if p[k] < p[i] {
+			j = i
+			break
+		}
+	}
+	q := copySlice(p)
+	q[k], q[j] = q[j], q[k]
+	a, b := k+1, n-1
+	for a < b {
+		q[a], q[b] = q[b], q[a]
+		a++
+		b--
+	}
+	return q
+}
+
+func mostUnsortedSlice(n int) []int {
+	A := newSlice(n)
+	return append(A[n/2:], A[:n/2]...)
+}
+
+func isSorted(A []int) bool {
+	for i := len(A) - 1; 0 < i; i-- {
+		if A[i] < A[i-1] {
+			return false
+		}
+	}
+	return true
+}
+
+func avgIndexError(A []int) float64 {
+	n := len(A)
+	B := copySlice(A) // Sorted copy
+	sort.Ints(B)
+	var e float64   // Index error
+	var j, jmax int // Index range A[i] should be in B
+	for i := 0; i < n; i++ {
+		j = sort.Search(n, func(index int) bool { return A[i] <= B[index] })
+		jmax = j
+		for jmax+1 < n && B[j] == B[jmax+1] {
+			jmax++
+		}
+		e += math.Abs(float64(i) - (float64(j)+float64(jmax))/2.0)
+	}
+	return e / float64(n)
 }

@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	srt "sort"
 	"time"
 )
 
 func main() {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	srt.Sort(nil)
+	// sort.Sort(nil)
 	// A := people{
 	// 	&person{"", "a"},
 	// 	&person{"", "b"},
@@ -27,8 +26,24 @@ func main() {
 	// quickSortable(A, 0, A.length()-1)
 	// fmt.Printf("%v\n", A)
 
-	A := randomIntSlice(10)
-	fmt.Println(A)
-	quickSortable(A, 0, A.length()-1)
-	fmt.Println(A)
+	// A := randomIntSlice(10)
+	// fmt.Println(A)
+	// quickSortable(A, 0, A.length()-1)
+	// fmt.Println(A)
+
+	A := newSlice(10)
+	var B []int
+	var e, max float64
+	for {
+		A = nextSlice(A)
+		e = avgIndexError(A)
+		if max < e {
+			max = e
+			B = copySlice(A)
+		}
+		if isSorted(A) {
+			break
+		}
+	}
+	fmt.Println(B, max)
 }

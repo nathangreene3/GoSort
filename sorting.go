@@ -8,9 +8,9 @@ type sortable interface {
 	at(i int) interface{} // Returns the value at index
 }
 
-// sort is the general function to export that calls an internal sort
+// sortSortable is the general function to export that calls an internal sort
 // function.
-func sort(A sortable) {
+func sortSortable(A sortable) {
 	quickSortable(A, 0, A.length()-1)
 }
 
