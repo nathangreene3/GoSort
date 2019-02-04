@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	srt "sort"
 	"testing"
 )
@@ -21,7 +22,7 @@ func BenchmarkBubbleSortable(b0 *testing.B) {
 			fmt.Sprintf("BubbleSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					bubbleSortable(copyIntSlice(data[i].test))
+					bubbleSortable(copyIntSlice(data[i].test), 0, data[i].size-1)
 				}
 			},
 		)
@@ -43,7 +44,7 @@ func BenchmarkInsertionSortable(b0 *testing.B) {
 			fmt.Sprintf("InsertionSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					insertionSortable(copyIntSlice(data[i].test))
+					insertionSortable(copyIntSlice(data[i].test), 0, data[i].size-1)
 				}
 			},
 		)
@@ -66,6 +67,28 @@ func BenchmarkQuickSortable(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					quickSortable(copyIntSlice(data[i].test), 0, data[i].size-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkGosSortable(b0 *testing.B) {
+	data := []struct {
+		test intSlice
+		size int
+	}{
+		{mostUnsortedIntSlice(10), 10},
+		{mostUnsortedIntSlice(100), 100},
+		{mostUnsortedIntSlice(1000), 1000},
+		{mostUnsortedIntSlice(10000), 10000},
+	}
+	for i := range data {
+		b0.Run(
+			fmt.Sprintf("GosSortable on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					sort.Sort(data[i].test)
 				}
 			},
 		)
@@ -138,7 +161,7 @@ func BenchmarkQuickSort(b0 *testing.B) {
 	}
 }
 
-func BenchmarkGosSort(b0 *testing.B) {
+func BenchmarkGosInts(b0 *testing.B) {
 	data := []struct {
 		test intSlice
 		size int

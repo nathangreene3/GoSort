@@ -251,14 +251,24 @@ func (A intSlice) medianOfThreeSortable(a, b int) {
 func (A intSlice) length() int {
 	return len(A)
 }
+func (A intSlice) Len() int {
+	return len(A)
+}
 
 // less returns the comparison of two integers.
 func (A intSlice) less(i, j int) bool {
 	return A[i] < A[j]
 }
 
+func (A intSlice) Less(i, j int) bool {
+	return A[i] < A[j]
+}
+
 // swap swaps two values at two given indices.
 func (A intSlice) swap(i, j int) {
+	A[i], A[j] = A[j], A[i]
+}
+func (A intSlice) Swap(i, j int) {
 	A[i], A[j] = A[j], A[i]
 }
 

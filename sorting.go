@@ -2,25 +2,37 @@ package main
 
 // sortable data can be sorted using GoSort methods.
 type sortable interface {
-	length() int          // Number of items to be sorted
-	less(i, j int) bool   // Less than condition for item comparison
-	swap(i, j int)        // Swaps two items
-	at(i int) interface{} // Returns the value at index
+	length() int        // Number of items to be sorted
+	less(i, j int) bool // Less than condition for item comparison
+	swap(i, j int)      // Swaps two items
 }
 
 // sortSortable is the general function to export that calls an internal sort
 // function.
-func sortSortable(A sortable) {
-	quickSortable(A, 0, A.length()-1)
+func sortSortable(A sortable, a, b int) {
+	bmax := A.length() - 1
+	if a < 0 {
+		a = 0
+	}
+	if bmax < b {
+		b = bmax
+	}
+	if b-a < 16 {
+		insertionSortable(A, a, b)
+	} else {
+		quickSortable(A, a, b)
+		// bubbleSortable(A, a, b)
+		// insertionSortable(A, a, b)
+		// mergeSortable(A, a, b)
+	}
 }
 
-// bubbleSortable sorts sortable data.
-func bubbleSortable(A sortable) {
+// bubbleSortable sorts sortable data on the range [a,b].
+func bubbleSortable(A sortable, a, b int) {
 	c := true
-	m := A.length()
-	for ; c; m-- {
+	for m := b; c; m-- {
 		c = false
-		for i := 0; i+1 < m; i++ {
+		for i := a; i < m; i++ {
 			if A.less(i+1, i) {
 				A.swap(i, i+1)
 				c = true
@@ -29,14 +41,11 @@ func bubbleSortable(A sortable) {
 	}
 }
 
-// insertionSortable sorts sortable data.
-func insertionSortable(A sortable) sortable {
-	var j int
-	for i := 1; i < A.length(); i++ {
-		j = i - 1
-		for 0 <= j && A.less(j+1, j) {
+// insertionSortable sorts sortable data on the range [a,b].
+func insertionSortable(A sortable, a, b int) sortable {
+	for i := a + 1; i <= b; i++ {
+		for j := i - 1; 0 <= j && A.less(j+1, j); j-- {
 			A.swap(j, j+1)
-			j--
 		}
 	}
 	return A
