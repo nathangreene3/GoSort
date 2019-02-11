@@ -2,10 +2,95 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sort"
 	srt "sort"
 	"testing"
 )
+
+func randomBts(n int) []byte {
+	bts := make([]byte, 0, n)
+	for i := 0; i < n; i++ {
+		bts = append(bts, byte(rand.Intn(10)))
+	}
+	return bts
+}
+
+func TestKeySortToIncrementPositions(t *testing.T) {
+	data := []struct {
+		test         []byte
+		keyResult    []int
+		incPosResult []int
+		size         int
+	}{
+		// {randomBts(10), nil, nil, 10},
+		// {randomBts(100), nil, nil, 100},
+		// {randomBts(1000), nil, nil, 1000},
+		// {randomBts(10000), nil, nil, 10000},
+		{[]byte("1230"), nil, nil, 4},
+	}
+	for i := range data {
+		data[i].keyResult = keySort(data[i].test, nil, 0, data[i].size-1)
+		data[i].incPosResult = incrementPositions(data[i].test)
+
+		if len(data[i].keyResult) != data[i].size {
+			t.Fatalf("keySort returned length %d instead of %d\n", len(data[i].keyResult), data[i].size)
+		}
+		if len(data[i].incPosResult) != data[i].size {
+			t.Fatalf("incrementPositions returned length %d instead of %d\n", len(data[i].incPosResult), data[i].size)
+		}
+
+		for j := range data[i].keyResult {
+			if data[i].keyResult[j] != data[i].incPosResult[j] {
+				t.Fatalf("\nkeySort result:           %v\nincrementPosition result: %v\n", data[i].keyResult, data[i].incPosResult)
+			}
+		}
+	}
+}
+
+func BenchmarkKeySortable(b0 *testing.B) {
+	data := []struct {
+		test []byte
+		size int
+	}{
+		{randomBts(10), 10},
+		{randomBts(100), 100},
+		{randomBts(1000), 1000},
+		{randomBts(10000), 10000},
+	}
+	for i := range data {
+		b0.Run(
+			fmt.Sprintf("KeySort on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					keySort(data[i].test, nil, 0, data[i].size-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkIncrementPositions(b0 *testing.B) {
+	data := []struct {
+		test []byte
+		size int
+	}{
+		{randomBts(10), 10},
+		{randomBts(100), 100},
+		{randomBts(1000), 1000},
+		{randomBts(10000), 10000},
+	}
+	for i := range data {
+		b0.Run(
+			fmt.Sprintf("IncrementPositions on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					incrementPositions(data[i].test)
+				}
+			},
+		)
+	}
+}
 
 func BenchmarkBubbleSortable(b0 *testing.B) {
 	data := []struct {
