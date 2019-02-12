@@ -3,21 +3,22 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 )
 
 func main() {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	bts := []byte("fdsa")
-	n := len(bts)
-	perm := newPermutation(n)
-	fmt.Println(bts, perm)
 
-	perm = keySort(bts, nil, 0, n-1)
-	fmt.Println(bts, perm)
+	// bts := []byte("1230")
+	// n := len(bts)
 
-	perm = keySort(bts, perm, 0, n-1)
-	fmt.Println(bts, perm)
+	// fmt.Println(indexMap(bts, 0, n-1))
+	// fmt.Println(incrementPositions(bts))
+	// fmt.Println(getIncrementPositions(string(bts)))
+	fmt.Println(perm(10))
+	fmt.Println(randomPermBts(10))
 }
 
 // keySort sorts a byte slice and returns a permutation indicating the index
@@ -54,6 +55,35 @@ func keySort(bts []byte, indexMap []int, a, b int) []int {
 	return indexMap
 }
 
+// indexMap returns a permutation indicating the sort order of the indices of the
+// given byte slice over the range [a,b], where 0 <= a <= b < len(bts).
+func indexMap(bts []byte, a, b int) []int {
+	m := make([]int, 0, len(bts)) // An ordering (permutation) of [0, 1, 2, ..., n-1]
+	for i := range bts {
+		m = append(m, i)
+	}
+
+	// Insertionsort on m, not bts
+	var j int    // Indexer
+	var mi int   // Temporary storage; mi is always a copy of m[i]
+	var bte byte // Temporary storage; bte is always a copy of bts[m[i]]
+
+	for i := a + 1; i <= b; i++ {
+		mi = m[i]
+		bte = bts[mi]
+
+		for j = i - 1; a <= j && bte < bts[m[j]]; j-- {
+			// m[j+1] = m[j]
+		}
+
+		// m[j+1] = mi
+		copy(m[j+2:i+1], m[j+1:i])
+		m[j+1] = mi
+	}
+
+	return m
+}
+
 func newPermutation(n int) []int {
 	perm := make([]int, 0, n)
 	for i := 0; i < n; i++ {
@@ -73,4 +103,68 @@ func incrementPositions(incrementOrder []byte) []int {
 		}
 	}
 	return pos
+}
+
+func getIncrementPositions(incrementOrder string) string {
+	var indexOf int
+	sb := strings.Builder{}
+	sb.Grow(8)
+
+	for i := 1; i < 9; i++ {
+		indexOf = strings.Index(incrementOrder, strconv.Itoa(i))
+		if 0 <= indexOf {
+			sb.WriteString(strconv.Itoa(indexOf))
+		}
+	}
+
+	return sb.String()
+}
+
+func randomBts(n int) []byte {
+	bts := make([]byte, 0, n)
+	for i := 0; i < n; i++ {
+		bts = append(bts, byte(rand.Intn(10)))
+	}
+	return bts
+}
+
+// TODO: make permutation type with full functionality.  See GoTSP usage.
+func perm(n int) []int {
+	if n < 1 {
+		return []int{}
+	}
+
+	p := make([]int, n) // First value is always zero
+	var j int
+
+	for i := 1; i < n; i++ {
+		j = rand.Intn(i + 1)
+		p[i] = p[j]
+		p[j] = i
+	}
+
+	return p
+}
+
+// randomPermBts returns a random permutation of a given length. Panics if length
+// is greater than 255. Returns an empty byte slice if n is less than one.
+func randomPermBts(n int) []byte {
+	if 255 < n {
+		panic("maximum random permutation length is 255")
+	}
+
+	if n < 1 {
+		return []byte{}
+	}
+
+	bts := make([]byte, n)
+	var j int
+
+	for i := 1; i < n; i++ {
+		j = rand.Intn(i + 1)
+		bts[i] = bts[j]
+		bts[j] = byte(i)
+	}
+
+	return bts
 }

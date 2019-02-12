@@ -2,49 +2,101 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"sort"
 	srt "sort"
 	"testing"
+
+	"github.com/cheynewallace/tabby"
 )
 
-func randomBts(n int) []byte {
-	bts := make([]byte, 0, n)
-	for i := 0; i < n; i++ {
-		bts = append(bts, byte(rand.Intn(10)))
-	}
-	return bts
-}
-
-func TestKeySortToIncrementPositions(t *testing.T) {
+func TestIndexMap(t *testing.T) {
 	data := []struct {
-		test         []byte
-		keyResult    []int
-		incPosResult []int
-		size         int
+		test   []byte
+		result []int
+		size   int
 	}{
-		// {randomBts(10), nil, nil, 10},
-		// {randomBts(100), nil, nil, 100},
-		// {randomBts(1000), nil, nil, 1000},
-		// {randomBts(10000), nil, nil, 10000},
-		{[]byte("1230"), nil, nil, 4},
+		{randomBts(0), nil, 0},
+		{randomBts(1), nil, 0},
+		{randomBts(10), nil, 0},
+		{randomBts(100), nil, 0},
+		{randomBts(1000), nil, 0},
+		{randomBts(10000), nil, 0},
 	}
+
+	table := tabby.New()
+	table.AddHeader("INDEX", "INPUT", "RESULT")
+	var failed bool
+
 	for i := range data {
-		data[i].keyResult = keySort(data[i].test, nil, 0, data[i].size-1)
-		data[i].incPosResult = incrementPositions(data[i].test)
+		data[i].size = len(data[i].test)
+		data[i].result = indexMap(data[i].test, 0, data[i].size-1)
 
-		if len(data[i].keyResult) != data[i].size {
-			t.Fatalf("keySort returned length %d instead of %d\n", len(data[i].keyResult), data[i].size)
-		}
-		if len(data[i].incPosResult) != data[i].size {
-			t.Fatalf("incrementPositions returned length %d instead of %d\n", len(data[i].incPosResult), data[i].size)
+		if len(data[i].result) != data[i].size {
+			table.AddLine(i, data[i].test, data[i].result)
+			failed = true
+			continue
 		}
 
-		for j := range data[i].keyResult {
-			if data[i].keyResult[j] != data[i].incPosResult[j] {
-				t.Fatalf("\nkeySort result:           %v\nincrementPosition result: %v\n", data[i].keyResult, data[i].incPosResult)
+		for j := 0; j < data[i].size-1; j++ {
+			if data[i].test[data[i].result[j+1]] < data[i].test[data[i].result[j]] {
+				table.AddLine(i, data[i].test, data[i].result)
+				failed = true
 			}
 		}
+	}
+
+	if failed {
+		table.Print()
+		t.Fatal("\n")
+	}
+}
+
+func TestIndexMapToIncrementPositions(t *testing.T) {
+	data := []struct {
+		test           []byte
+		indexMapResult []int
+		incPosResult   []int
+		size           int
+	}{
+		{randomBts(0), nil, nil, 0},
+		{randomBts(1), nil, nil, 0},
+		{randomBts(2), nil, nil, 0},
+		{randomBts(3), nil, nil, 0},
+		{randomBts(4), nil, nil, 0},
+		{randomBts(5), nil, nil, 0},
+		{randomBts(6), nil, nil, 0},
+		{randomBts(7), nil, nil, 0},
+		{randomBts(8), nil, nil, 0},
+		{randomBts(9), nil, nil, 0},
+	}
+
+	table := tabby.New()
+	table.AddHeader("FUNCTION", "INPUT", "RESULT")
+	var failed bool
+
+	for i := range data {
+		data[i].size = len(data[i].test)
+		data[i].indexMapResult = indexMap(data[i].test, 0, data[i].size-1)
+		data[i].incPosResult = incrementPositions(data[i].test)
+
+		if len(data[i].indexMapResult) != data[i].size || len(data[i].incPosResult) != data[i].size {
+			table.AddLine("GetIncrementPositions", data[i].test, data[i].incPosResult)
+			table.AddLine("indexMap", data[i].test, data[i].indexMapResult)
+			failed = true
+			continue
+		}
+
+		for j := range data[i].indexMapResult {
+			if data[i].indexMapResult[j] != data[i].incPosResult[j] {
+				table.AddLine("GetIncrementPositions", data[i].test, data[i].incPosResult)
+				table.AddLine("indexMap", data[i].test, data[i].indexMapResult)
+				failed = true
+			}
+		}
+	}
+	if failed {
+		table.Print()
+		// t.Fatal("\n")
 	}
 }
 
@@ -64,6 +116,28 @@ func BenchmarkKeySortable(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					keySort(data[i].test, nil, 0, data[i].size-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkIndexMap(b0 *testing.B) {
+	data := []struct {
+		test []byte
+		size int
+	}{
+		{randomBts(10), 10},
+		{randomBts(100), 100},
+		{randomBts(1000), 1000},
+		{randomBts(10000), 10000},
+	}
+	for i := range data {
+		b0.Run(
+			fmt.Sprintf("indexMap on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					indexMap(data[i].test, 0, data[i].size-1)
 				}
 			},
 		)
