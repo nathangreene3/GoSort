@@ -11,14 +11,9 @@ import (
 func main() {
 	rand.Seed(int64(time.Now().Nanosecond()))
 
-	// bts := []byte("1230")
-	// n := len(bts)
-
-	// fmt.Println(indexMap(bts, 0, n-1))
-	// fmt.Println(incrementPositions(bts))
-	// fmt.Println(getIncrementPositions(string(bts)))
-	fmt.Println(perm(10))
-	fmt.Println(randomPermBts(10))
+	A := randomBts(100)
+	B := countingSortBts(A)
+	fmt.Println(A, B)
 }
 
 // keySort sorts a byte slice and returns a permutation indicating the index

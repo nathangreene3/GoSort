@@ -12,42 +12,73 @@ type intSlice []int
 // []int sorting methods
 // ----------------------------------------------------------------------
 
-// countingSort: TODO
-func countingSort(A []int) []int {
-	// Find range of A to set up m
-	m := make(map[int]int)
-	min := A[0]
+func countingSortBts(A []byte) []byte {
+	n := len(A)
+	B := make([]byte, n)
+
 	max := A[0]
-	for i := range A {
-		if A[i] < min {
-			min = A[i]
-		}
+	for i := 1; i < n; i++ {
 		if max < A[i] {
 			max = A[i]
 		}
 	}
-	for i := min; i <= max; i++ {
-		m[i] = 0
-	}
 
-	// Define m to be the frequency of the range of A
+	k := int(max) + 1
+	C := make([]byte, int(k))
 	for i := range A {
-		m[A[i]]++
+		C[A[i]]++
 	}
 
-	// Redefine m to be the cumulative frequency of the range of A
-	for i := min + 1; i <= max; i++ {
-		m[i] += m[i-1]
+	for i := 1; i < k; i++ {
+		C[i] += C[i-1]
 	}
 
-	B := make([]int, len(A))
-	i := 0
-	for k, v := range m {
-		if 0 < v {
-			B[i] = k
-			i++
+	var a, c byte
+	for i := n - 1; 0 <= i; i-- {
+		a = A[i]
+		c = C[a]
+		B[c-1] = a
+		C[a]--
+	}
+
+	return B
+}
+
+// countingSort: TODO
+func countingSort(A []int) []int {
+	n := len(A)
+	B := make([]int, n)
+
+	min, max := A[0], A[0]
+	for i := 1; i < n; i++ {
+		if A[i] < min {
+			min = A[i]
+			continue
+		}
+
+		if max < A[i] {
+			max = A[i]
 		}
 	}
+
+	k := max - min
+	C := make([]int, k)
+	for i := range A {
+		C[A[i]]++
+	}
+
+	for i := 1; i < k; i++ {
+		C[i] += C[i-1]
+	}
+
+	var a, c int
+	for i := n - 1; 0 <= i; i-- {
+		a = A[i]
+		c = C[a]
+		B[c] = a
+		C[a]--
+	}
+
 	return B
 }
 
