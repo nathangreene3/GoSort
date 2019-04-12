@@ -2,112 +2,68 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"testing"
 )
 
-type ints []int
-
-func (A *ints) length() int {
-	return len(*A)
-}
-
-func (A *ints) compare(i, j int) int {
-	switch {
-	case (*A)[i] < (*A)[j]:
-		return -1
-	case (*A)[j] < (*A)[i]:
-		return 1
-	default:
-		return 0
-	}
-}
-
-func (A *ints) swap(i, j int) {
-	t := (*A)[i]
-	(*A)[i] = (*A)[j]
-	(*A)[j] = t
-}
-
-func reversedInts(n int) *ints {
-	A := make(ints, 0, n)
-	for 0 < n {
-		n--
-		A = append(A, n)
-	}
-
-	return &A
-}
-
-func copyInts(A *ints) *ints {
-	n := A.length()
-	B := make(ints, 0, n)
-	for i := 0; i < n; i++ {
-		B = append(B, (*A)[i])
-	}
-
-	return &B
-}
-
 func TestSort(t *testing.T) {
-	data := []struct {
-		test *ints
-		size int
-	}{
-		{reversedInts(1), 1},
-		{reversedInts(10), 10},
-		{reversedInts(100), 100},
-		{reversedInts(1000), 1000},
-		{reversedInts(10000), 10000},
-	}
+	data := [5]*ints{}
 
 	for i := range data {
-		if isSorted(data[i].test) {
-			t.Fatalf("TestSort: %v\n", *data[i].test)
+		data[i] = reversedInts(int(math.Pow(10, float64(i))))
+		sort(data[i])
+		if !isSorted(data[i]) {
+			t.Fatalf("TestSort: %v\n", *data[i])
 		}
 	}
 }
 
-func BenchmarkInsertionSortable(b0 *testing.B) {
-	data := []struct {
-		test *ints
-		size int
-	}{
-		{reversedInts(1), 1},
-		{reversedInts(10), 10},
-		{reversedInts(100), 100},
-		{reversedInts(1000), 1000},
-		{reversedInts(10000), 10000},
-	}
+func TestStable(t *testing.T) {
+	data := [5]*ints{}
 
 	for i := range data {
+		data[i] = reversedInts(int(math.Pow(10, float64(i))))
+		stable(data[i])
+		if !isSorted(data[i]) {
+			t.Fatalf("TestSort: %v\n", *data[i])
+		}
+	}
+}
+
+func TestSearch(t *testing.T) {
+
+}
+
+func BenchmarkInsertionsort(b0 *testing.B) {
+	data := [5]*ints{}
+	var n int
+
+	for i := range data {
+		data[i] = reversedInts(int(math.Pow(10, float64(i))))
+		n = data[i].length() - 1
 		b0.Run(
-			fmt.Sprintf("InsertionSortable on size 10^%d", i),
+			fmt.Sprintf("InsertionSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					insertionSortable(copyInts(data[i].test), 0, data[i].size-1)
+					insertionsort(copyInts(data[i]), 0, n)
 				}
 			},
 		)
 	}
 }
 
-func BenchmarkQuickSortable(b0 *testing.B) {
-	data := []struct {
-		test *ints
-		size int
-	}{
-		{reversedInts(1), 1},
-		{reversedInts(10), 10},
-		{reversedInts(100), 100},
-		{reversedInts(1000), 1000},
-		{reversedInts(10000), 10000},
-	}
+func BenchmarkQuicksort(b0 *testing.B) {
+	data := [5]*ints{}
+	var n int
+
 	for i := range data {
+		data[i] = reversedInts(int(math.Pow(10, float64(i))))
+		n = data[i].length() - 1
 		b0.Run(
-			fmt.Sprintf("QuickSortable on size 10^%d", i),
+			fmt.Sprintf("QuickSortable on size 10^%d", i+1),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					quickSortable(copyInts(data[i].test), 0, data[i].size-1)
+					quicksort(copyInts(data[i]), 0, n)
 				}
 			},
 		)
