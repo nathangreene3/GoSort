@@ -1,22 +1,19 @@
-package main
-
-import (
-	"math/rand"
-	"time"
-)
+package sort
 
 // ints implements sortable interface to demonstrate sorting functionality.
 type ints []int
 
-func main() {
-	rand.Seed(int64(time.Now().Nanosecond()))
-}
+// func main() {
+// 	rand.Seed(int64(time.Now().Nanosecond()))
+// }
 
-func (A *ints) length() int {
+// Length returns the number of integers.
+func (A *ints) Length() int {
 	return len(*A)
 }
 
-func (A *ints) compare(i, j int) int {
+// Compare two indexed integers.
+func (A *ints) Compare(i, j int) int {
 	switch {
 	case (*A)[i] < (*A)[j]:
 		return -1
@@ -27,7 +24,8 @@ func (A *ints) compare(i, j int) int {
 	}
 }
 
-func (A *ints) compareTo(x interface{}, i int) int {
+// CompareTo compares an integer to an indexed integer.
+func (A *ints) CompareTo(x interface{}, i int) int {
 	y, ok := x.(int)
 	switch {
 	case !ok:
@@ -41,12 +39,14 @@ func (A *ints) compareTo(x interface{}, i int) int {
 	}
 }
 
-func (A *ints) swap(i, j int) {
+// Swap two indexed integers.
+func (A *ints) Swap(i, j int) {
 	t := (*A)[i]
 	(*A)[i] = (*A)[j]
 	(*A)[j] = t
 }
 
+// reversedInts returns [n-1, n-2, ..., 0].
 func reversedInts(n int) *ints {
 	A := make(ints, 0, n)
 	for 0 < n {
@@ -57,8 +57,9 @@ func reversedInts(n int) *ints {
 	return &A
 }
 
+// copyInts returns a copy of a set of integers.
 func copyInts(A *ints) *ints {
-	n := A.length()
+	n := A.Length()
 	B := make(ints, 0, n)
 	for i := 0; i < n; i++ {
 		B = append(B, (*A)[i])
