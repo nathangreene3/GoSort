@@ -3,10 +3,6 @@ package sort
 // ints implements sortable interface to demonstrate sorting functionality.
 type ints []int
 
-// func main() {
-// 	rand.Seed(int64(time.Now().Nanosecond()))
-// }
-
 // Length returns the number of integers.
 func (A *ints) Length() int {
 	return len(*A)
@@ -44,6 +40,16 @@ func (A *ints) Swap(i, j int) {
 	t := (*A)[i]
 	(*A)[i] = (*A)[j]
 	(*A)[j] = t
+}
+
+// sortedInts returns [0, 1, ..., n-1].
+func sortedInts(n int) *ints {
+	A := make(ints, 0, n)
+	for i := 0; i < n; i++ {
+		A = append(A, i)
+	}
+
+	return &A
 }
 
 // reversedInts returns [n-1, n-2, ..., 0].

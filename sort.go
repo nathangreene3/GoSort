@@ -86,8 +86,11 @@ func IsSorted(A Sortable) bool {
 
 // Search returns the index an item belongs in a sortable set. Does not guarentee the item's existence in the set.
 func Search(x interface{}, A Sortable) int {
-	i, j := 0, A.Length()-1
-	var k int
+	var (
+		i int              // Lower index
+		j = A.Length() - 1 // Upper index
+		k int              // Middle index
+	)
 	for i < j {
 		k = int(uint(i+j) >> 1)
 		if 0 < A.CompareTo(x, k) {
