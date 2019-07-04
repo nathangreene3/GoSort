@@ -3,9 +3,14 @@ package sort
 // ints implements sortable interface to demonstrate sorting functionality.
 type ints []int
 
-// Length returns the number of integers.
-func (A *ints) Length() int {
+// Len returns the number of integers.
+func (A *ints) Len() int {
 	return len(*A)
+}
+
+// Less returns A[i] < A[j].
+func (A *ints) Less(i, j int) bool {
+	return (*A)[i] < (*A)[j]
 }
 
 // Compare two indexed integers.
@@ -20,15 +25,12 @@ func (A *ints) Compare(i, j int) int {
 	}
 }
 
-// CompareTo compares an integer to an indexed integer.
-func (A *ints) CompareTo(x interface{}, i int) int {
-	y, ok := x.(int)
+// CompareAt returns the comparison of A[i] to an integer.
+func (A *ints) CompareAt(i int, x interface{}) int {
 	switch {
-	case !ok:
-		panic("ints.compareTo: value not an int")
-	case y < (*A)[i]:
+	case (*A)[i] < x.(int):
 		return -1
-	case (*A)[i] < y:
+	case x.(int) < (*A)[i]:
 		return 1
 	default:
 		return 0
@@ -65,7 +67,7 @@ func reversedInts(n int) *ints {
 
 // copyInts returns a copy of a set of integers.
 func copyInts(A *ints) *ints {
-	n := A.Length()
+	n := A.Len()
 	B := make(ints, 0, n)
 	for i := 0; i < n; i++ {
 		B = append(B, (*A)[i])
