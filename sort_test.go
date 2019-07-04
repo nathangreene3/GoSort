@@ -92,18 +92,17 @@ func BenchmarkQuicksort(b0 *testing.B) {
 
 func BenchmarkSearch(b0 *testing.B) {
 	var (
-		data   = [16]*ints{}
+		data   = [5]*ints{}// Careful... this is powers of ten
 		length int
 	)
 	for i := range data {
-		data[i] = sortedInts(int(math.Pow10(i)))
-		length = i + 1
-
+		length = int(math.Pow10(i))
+		data[i] = sortedInts(length)
 		b0.Run(
 			fmt.Sprintf("Search for 0th element on size %d", length),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					Search(data[i], i)
+					Search(data[i], 0)
 				}
 			},
 		)
