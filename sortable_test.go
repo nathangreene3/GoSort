@@ -90,20 +90,20 @@ func BenchmarkQuicksort(b0 *testing.B) {
 	}
 }
 
-/*
 func BenchmarkSearch(b0 *testing.B) {
-	data := [5]*ints{}
-	var n int // Largest index
-
+	var (
+		data   = [16]*ints{}
+		length int
+	)
 	for i := range data {
 		data[i] = sortedInts(int(math.Pow10(i)))
-		n = data[i].Len() - 1
+		length = i + 1
 
 		b0.Run(
-			fmt.Sprintf("QuickSortable on size 10^%d", i+1),
+			fmt.Sprintf("Search for 0th element on size %d", length),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					Search(data[i])
+					Search(data[i], i)
 				}
 			},
 		)
@@ -112,16 +112,16 @@ func BenchmarkSearch(b0 *testing.B) {
 
 func BenchmarkInsertionsort2(b0 *testing.B) {
 	var (
-		data = [16]*ints{}
-		n    int
+		data   = [16]*ints{}
+		length int
 	)
 	for i := range data {
-		data[i] = reversedInts(2 * i)
-		n = data[i].length() - 1
+		length = i + 1
+		data[i] = reversedInts(length)
 		b0.Run(
-			fmt.Sprintf("Insertionsort on size %d", 2*i), func(b1 *testing.B) {
+			fmt.Sprintf("Insertionsort on size %d", length), func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					insertionsort(copyInts(data[i]), 0, n)
+					insertionsort(copyInts(data[i]), 0, length-1)
 				}
 			},
 		)
@@ -129,19 +129,20 @@ func BenchmarkInsertionsort2(b0 *testing.B) {
 }
 
 func BenchmarkQuicksort2(b0 *testing.B) {
-	data := [16]*ints{}
-	var n int
+	var (
+		data   = [16]*ints{}
+		length int
+	)
 	for i := range data {
-		data[i] = reversedInts(2 * i)
-		n = data[i].length() - 1
+		length = i + 1
+		data[i] = reversedInts(length)
 		b0.Run(
-			fmt.Sprintf("Quicksort on size %d", 2*i),
+			fmt.Sprintf("Quicksort on size %d", length),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
-					quicksort(copyInts(data[i]), 0, n)
+					quicksort(copyInts(data[i]), 0, length-1)
 				}
 			},
 		)
 	}
 }
-*/

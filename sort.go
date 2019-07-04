@@ -8,17 +8,17 @@ type Interface interface {
 	Swap(i, j int)
 }
 
-// Sort sortable data.
+// Sort data.
 func Sort(A Interface) {
 	quicksort(A, 0, A.Len()-1)
 }
 
-// Stable sort sortable data.
+// Stable sort data.
 func Stable(A Interface) {
 	insertionsort(A, 0, A.Len()-1)
 }
 
-// insertionsort sorts sortable data on the range [a,b].
+// insertionsort data on the range [a,b].
 func insertionsort(A Interface, a, b int) {
 	for i := a + 1; i <= b; i++ {
 		for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
@@ -27,7 +27,7 @@ func insertionsort(A Interface, a, b int) {
 	}
 }
 
-// quicksort sorts sortable data on the range [a,b].
+// quicksort data on the range [a,b].
 func quicksort(A Interface, a, b int) {
 	if a < b {
 		if b-a < 9 {
@@ -40,8 +40,8 @@ func quicksort(A Interface, a, b int) {
 	}
 }
 
-// pivot pivots sortable data on the range [a,b] by selecting the
-// pivot index by the median-of-three method.
+// pivot pivots data on the range [a,b] by selecting the pivot index
+// by the median-of-three method. The pivot index is returned.
 func pivot(A Interface, a, b int) int {
 	medianOfThree(A, a, b)
 	p := a
@@ -56,9 +56,12 @@ func pivot(A Interface, a, b int) int {
 	return p
 }
 
-// medianOfThree sorts the values at indices a, b, and (a+b)/2.
+// medianOfThree sets the a-th value to be the median, and the
+// (a+b)/2-th and b-th value to be in order.
 func medianOfThree(A Interface, a, b int) {
-	c := int(uint(a+b) >> 1)
+	// Example: [9,7,5] becomes [7,5,9].
+
+	c := int(uint(a+b) >> 1) // (a+b)/2
 	if A.Compare(a, b) < 0 {
 		A.Swap(a, b)
 	}
@@ -72,7 +75,20 @@ func medianOfThree(A Interface, a, b int) {
 	}
 }
 
-// IsSorted determines if a sortable object is sorted.
+// medianOfFive sets the median of five values to the a-th index. The
+// other four values may not be in order.
+func medianOfFive(A Interface, a, b int) {
+	// This doesn't seem to improve anything. It's worse than medianOfThree.
+	c := int(uint(a+b) >> 1) // (a+b)/2
+	if 4 < b-a {
+		medianOfThree(A, c, b) // Put median of [c:b] to c
+		medianOfThree(A, a, c) // Then put median of [a:c] to a
+	} else {
+		medianOfThree(A, c, b) // Put median of [c:b] to c
+	}
+}
+
+// IsSorted determines if data is sorted.
 func IsSorted(A Interface) bool {
 	n := A.Len() - 1
 	for i := 0; i < n; i++ {
@@ -84,26 +100,27 @@ func IsSorted(A Interface) bool {
 	return true
 }
 
-// Search returns the index an item belongs in a sortable set and whether or not it was found.
+// Search returns the index an item belongs in a list of items and
+// whether or not it was found.
 func Search(A Interface, x interface{}) (int, bool) {
 	var (
-		c int           // Comparison result
-		i int           // Lower index
-		j int           // Middle index
-		k = A.Len() - 1 // Upper index
+		r int           // Comparison result
+		a int           // Lower index
+		b int           // Middle index
+		c = A.Len() - 1 // Upper index
 	)
-	for i <= k {
-		j = (i + k) / 2
-		c = A.CompareAt(j, x)
+	for a <= c {
+		b = int(uint(a+c) >> 1) // (i + k) / 2
+		r = A.CompareAt(b, x)
 		switch {
-		case c < 0:
-			i = j + 1
-		case 0 < c:
-			k = j - 1
+		case r < 0:
+			a = b + 1
+		case 0 < r:
+			c = b - 1
 		default:
-			return j, true
+			return b, true
 		}
 	}
 
-	return i, false
+	return a, false
 }
