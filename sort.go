@@ -18,6 +18,43 @@ func Stable(A Interface) {
 	insertionsort(A, 0, A.Len()-1)
 }
 
+// IsSorted determines if data is sorted.
+func IsSorted(A Interface) bool {
+	n := A.Len() - 1
+	for i := 0; i < n; i++ {
+		if 0 < A.Compare(i, i+1) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Search returns the index an item belongs in a list of items and
+// whether or not it was found.
+func Search(A Interface, x interface{}) (int, bool) {
+	var (
+		r int           // Comparison result
+		a int           // Lower index
+		b int           // Middle index
+		c = A.Len() - 1 // Upper index
+	)
+	for a <= c {
+		b = int(uint(a+c) >> 1) // (i + k) / 2
+		r = A.CompareAt(b, x)
+		switch {
+		case r < 0:
+			a = b + 1
+		case 0 < r:
+			c = b - 1
+		default:
+			return b, true
+		}
+	}
+
+	return a, false
+}
+
 // insertionsort data on the range [a,b].
 func insertionsort(A Interface, a, b int) {
 	for i := a + 1; i <= b; i++ {
@@ -73,54 +110,4 @@ func medianOfThree(A Interface, a, b int) {
 	if A.Compare(b, c) < 0 {
 		A.Swap(b, c)
 	}
-}
-
-// medianOfFive sets the median of five values to the a-th index. The
-// other four values may not be in order.
-func medianOfFive(A Interface, a, b int) {
-	// This doesn't seem to improve anything. It's worse than medianOfThree.
-	c := int(uint(a+b) >> 1) // (a+b)/2
-	if 4 < b-a {
-		medianOfThree(A, c, b) // Put median of [c:b] to c
-		medianOfThree(A, a, c) // Then put median of [a:c] to a
-	} else {
-		medianOfThree(A, c, b) // Put median of [c:b] to c
-	}
-}
-
-// IsSorted determines if data is sorted.
-func IsSorted(A Interface) bool {
-	n := A.Len() - 1
-	for i := 0; i < n; i++ {
-		if 0 < A.Compare(i, i+1) {
-			return false
-		}
-	}
-
-	return true
-}
-
-// Search returns the index an item belongs in a list of items and
-// whether or not it was found.
-func Search(A Interface, x interface{}) (int, bool) {
-	var (
-		r int           // Comparison result
-		a int           // Lower index
-		b int           // Middle index
-		c = A.Len() - 1 // Upper index
-	)
-	for a <= c {
-		b = int(uint(a+c) >> 1) // (i + k) / 2
-		r = A.CompareAt(b, x)
-		switch {
-		case r < 0:
-			a = b + 1
-		case 0 < r:
-			c = b - 1
-		default:
-			return b, true
-		}
-	}
-
-	return a, false
 }
