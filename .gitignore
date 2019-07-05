@@ -1,3 +1,4 @@
 *.exe
+*.xlsx
 sort
-ints.go
+ints
