@@ -36,10 +36,10 @@ func Pop(h Interface) interface{} {
 // siftUp corrects the heap from i up.
 func siftUp(h Interface, i int) {
 	if 0 < i {
-		j := int(uint(i-1) >> 1) // Parent index: (i-1)/2
-		if 0 < h.Compare(j, i) {
-			h.Swap(i, j)
-			siftUp(h, j)
+		p := int(uint(i-1) >> 1) // Parent index: (i-1)/2
+		if 0 < h.Compare(p, i) {
+			h.Swap(p, i)
+			siftUp(h, p)
 		}
 	}
 }

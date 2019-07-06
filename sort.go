@@ -34,13 +34,13 @@ func IsSorted(A Interface) bool {
 // whether or not it was found.
 func Search(A Interface, x interface{}) (int, bool) {
 	var (
-		r int           // Comparison result
-		a int           // Lower index
-		b int           // Middle index
-		c = A.Len() - 1 // Upper index
+		r int
+		a int
+		b int
+		c = A.Len() - 1
 	)
 	for a <= c {
-		b = int(uint(a+c) >> 1) // (i + k) / 2
+		b = int(uint(a+c) >> 1) // (a+c)/2
 		r = A.CompareAt(b, x)
 		switch {
 		case r < 0:
@@ -67,47 +67,38 @@ func insertionsort(A Interface, a, b int) {
 // quicksort data on the range [a,b].
 func quicksort(A Interface, a, b int) {
 	if a < b {
-		if b-a < 9 {
-			insertionsort(A, a, b)
-		} else {
-			p := pivot(A, a, b)
-			quicksort(A, a, p-1)
-			quicksort(A, p+1, b)
+		// if b-a < 9 {
+		// 	// Insertionsort
+		// 	for i := a + 1; i <= b; i++ {
+		// 		for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
+		// 			A.Swap(j, j+1)
+		// 		}
+		// 	}
+		// } else {
+		// Median of three
+		c := int(uint(a+b) >> 1) // (a+b)/2
+		if A.Compare(a, b) < 0 {
+			A.Swap(a, b)
 		}
-	}
-}
-
-// pivot pivots data on the range [a,b] by selecting the pivot index
-// by the median-of-three method. The pivot index is returned.
-func pivot(A Interface, a, b int) int {
-	medianOfThree(A, a, b)
-	p := a
-	for i := a + 1; i <= b; i++ {
-		if A.Compare(i, a) < 0 {
-			p++
-			A.Swap(i, p)
+		if A.Compare(c, a) < 0 {
+			A.Swap(a, c)
 		}
-	}
+		if A.Compare(b, c) < 0 {
+			A.Swap(b, c)
+		}
 
-	A.Swap(a, p)
-	return p
-}
+		// Pivot
+		p := a
+		for i := a + 1; i <= b; i++ {
+			if A.Compare(i, a) < 0 {
+				p++
+				A.Swap(i, p)
+			}
+		}
+		A.Swap(a, p)
 
-// medianOfThree sets the a-th value to be the median, and the
-// (a+b)/2-th and b-th value to be in order.
-func medianOfThree(A Interface, a, b int) {
-	// Example: [9,7,5] becomes [7,5,9].
-
-	c := int(uint(a+b) >> 1) // (a+b)/2
-	if A.Compare(a, b) < 0 {
-		A.Swap(a, b)
-	}
-
-	if A.Compare(c, a) < 0 {
-		A.Swap(a, c)
-	}
-
-	if A.Compare(b, c) < 0 {
-		A.Swap(b, c)
+		quicksort(A, a, p-1)
+		quicksort(A, p+1, b)
+		// }
 	}
 }

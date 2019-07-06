@@ -10,17 +10,17 @@ The sort package contains functionality to sort and search data types that imple
 
 ### Interface
 
-* `Compare(i, j int) int:` Return -1 if the ith datum is less than the jth datum, 0 if equal, and 1 if greater.
-* `CompareTo(i int, x interface{}) int:` Return -1 if ith datum is less than x, 0 if equal, and 1 if greater.
-* `Len() int:` Return the number of datums.
-* `Swap(i, j int):` Interchange the ith datum with the jth datum.
+* `Compare(i, j int) int`: Return -1 if the ith item is less than the jth item, 0 if equal, and 1 if greater.
+* `CompareTo(i int, x interface{}) int`: Return -1 if ith item is less than x, 0 if equal, and 1 if greater.
+* `Len() int`: Return the number of items.
+* `Swap(i, j int)`: Interchange the ith item with the jth item.
 
 ### Functions
 
-* `Sort(A Interface) Sort:` Sorts sort data using quicksort on large ranges and insertionsort on small ranges.
-* `Stable(A Sort) Sort:` Sorts sort data using insertionsort.
-* `IsSorted(A Sort) bool:` Determines if sort data is sorted.
-* `Search(x interface{}, A Sort) int:` Determines the index in sort data an datum would be inserted into. Does not guarentee datum is in the sort data set.
+* `IsSorted(A Sort) bool`: Determines if sort data is sorted.
+* `Search(x interface{}, A Sort) int`: Determines the index in sort data an item would be inserted into. Does not guarentee item is in the sort data set.
+* `Sort(A Interface) Sort`: Sorts sort data using quicksort on large ranges and insertionsort on small ranges.
+* `Stable(A Sort) Sort`: Sorts sort data using insertionsort.
 
 ## Heap
 
@@ -32,12 +32,12 @@ The heap sub-package contains functionality to implement a minimum heap as a pri
 
 ### Interface
 
-* `sort.Interface:` Implement the `sort.Interface` requirements.
-* `Push(x interface{}):` Push a datum onto the heap.
-* `Pop() interface{}:` Pop a datum being the least-valued from the heap.
+* `sort.Interface`: Implement the `sort.Interface` requirements.
+* `Pop() interface{}`: Pop an item being the least-valued from the heap.
+* `Push(x interface{})`: Push an item onto the heap.
 
 ### Functions
 
-* `Heapify(h Interface):` Initialize `h` as the heap.
-* `Push(h Interface, x interface{}):` Push a datum onto the heap.
-* `Pop(h Interface) interface{}:` Pop a datum as the least-valued from the heap.
+* `Heapify(h Interface)`: Initialize `h` as the heap.
+* `Pop(h Interface) interface{}`: Pop an item as the least-valued from the heap.
+* `Push(h Interface, x interface{})`: Push an item onto the heap.
