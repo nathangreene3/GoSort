@@ -1,5 +1,9 @@
 package sort
 
+import (
+	"math"
+)
+
 // Interface defines the contract for sorting items.
 type Interface interface {
 	Compare(i, j int) int
@@ -80,9 +84,11 @@ func quicksort(A Interface, a, b int) {
 		if A.Compare(a, b) < 0 {
 			A.Swap(a, b)
 		}
+
 		if A.Compare(c, a) < 0 {
 			A.Swap(a, c)
 		}
+
 		if A.Compare(b, c) < 0 {
 			A.Swap(b, c)
 		}
@@ -95,10 +101,68 @@ func quicksort(A Interface, a, b int) {
 				A.Swap(i, p)
 			}
 		}
+
 		A.Swap(a, p)
 
 		quicksort(A, a, p-1)
 		quicksort(A, p+1, b)
 		// }
+	}
+}
+
+// heapsort data on the range [a,b].
+func heapsort(A Interface, a, b int) {
+	// Heapify A into a max heap
+	for i := b / 2; 0 <= i; i-- {
+		siftDown(A, i, b)
+	}
+
+	// Pop b-a times
+	for a < b {
+		A.Swap(a, b)
+		b--
+		siftDown(A, a, b)
+	}
+}
+
+// siftDown corrects the heap on the index range [a,b].
+func siftDown(A Interface, a, b int) {
+	j := int(uint(a)<<1) + 1 // Left child
+	if j <= b {
+		k := j + 1 // Right child
+		if k <= b && A.Compare(j, k) < 0 {
+			j = k
+		}
+
+		if A.Compare(a, j) < 0 {
+			A.Swap(a, j)
+			siftDown(A, j, b)
+		}
+	}
+}
+
+// shellsort data on the range [a,b]. This is the general case for insertionsort.
+func shellsort(A Interface, a, b int) {
+	// Generate more gaps if needed
+	var (
+		gaps = []int{1, 8, 23, 77, 281} // OEIS: A036526, Sedgewick: {1, 8, 23, 77, 281, ...}
+		g    int
+	)
+	for i := 4.0; ; i++ {
+		g = int(math.Pow(4, i) + 3*math.Pow(2, i-1) + 1)
+		if b < g+a {
+			break
+		}
+
+		gaps = append(gaps, g)
+	}
+
+	for n := len(gaps) - 1; 0 <= n; n-- {
+		g = gaps[n]
+		for i := a + g; i <= b; i++ {
+			for j := i - g; 0 <= j && 0 < A.Compare(j, j+g); j -= g {
+				A.Swap(j, j+g)
+			}
+		}
 	}
 }

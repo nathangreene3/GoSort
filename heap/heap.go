@@ -11,7 +11,7 @@ type Interface interface {
 	Pop() interface{}
 }
 
-// Heapify sets up an Interface as a min heap.
+// Heapify sets up an Interface as a max heap.
 func Heapify(h Interface) {
 	n := h.Len() - 1
 	for i := n / 2; 0 <= i; i-- {
@@ -47,15 +47,25 @@ func siftUp(h Interface, i int) {
 // siftDown corrects the heap from i down to n.
 func siftDown(h Interface, i, n int) {
 	j := int(uint(i)<<1) + 1 // Left child index
-	k := j + 1               // Right child index
 	if j <= n {
-		if k <= n && 0 < h.Compare(j, k) {
+		k := j + 1 // Right child index
+		if k <= n && h.Compare(j, k) < 0 {
 			j = k
 		}
 
-		if 0 < h.Compare(i, j) {
+		if h.Compare(i, j) < 0 {
 			h.Swap(i, j) // Swap with largest child
 			siftDown(h, j, n)
 		}
+	}
+}
+
+// Sort the heap.
+func Sort(h Interface) {
+	Heapify(h)
+	for n := h.Len() - 1; 0 < n; {
+		h.Swap(0, n)
+		n--
+		siftDown(h, 0, n)
 	}
 }

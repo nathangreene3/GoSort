@@ -86,9 +86,7 @@ func (A *Ints) Less(i, j int) bool {
 
 // Swap two indexed integers.
 func (A *Ints) Swap(i, j int) {
-	t := (*A)[i]
-	(*A)[i] = (*A)[j]
-	(*A)[j] = t
+	(*A)[i], (*A)[j] = (*A)[j], (*A)[i]
 }
 
 // Pop removes and returns an integer from a set of integers.
