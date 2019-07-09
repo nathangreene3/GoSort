@@ -9,22 +9,11 @@ import (
 	"github.com/nathangreene3/sort/ints"
 )
 
-func TestSort(t *testing.T) {
+func TestInsertionsort(t *testing.T) {
 	data := [5]ints.Ints{}
 	for i := range data {
 		data[i] = ints.Reversed(int(math.Pow(10, float64(i))))
-		Sort(&data[i])
-		if !IsSorted(&data[i]) {
-			t.Fatalf("TestSort: %v\n", data[i])
-		}
-	}
-}
-
-func TestStable(t *testing.T) {
-	data := [5]ints.Ints{}
-	for i := range data {
-		data[i] = ints.Reversed(int(math.Pow(10, float64(i))))
-		Stable(&data[i])
+		insertionsort(&data[i], 0, len(data[i])-1)
 		if !IsSorted(&data[i]) {
 			t.Fatalf("TestSort: %v\n", data[i])
 		}
@@ -49,6 +38,28 @@ func TestHeapsort(t *testing.T) {
 		heapsort(&data[i], 0, len(data[i])-1)
 		if !IsSorted(&data[i]) {
 			t.Fatalf("TestHeapsort: %v\n", data[i])
+		}
+	}
+}
+
+func TestQuicksort(t *testing.T) {
+	data := [5]ints.Ints{}
+	for i := range data {
+		data[i] = ints.Reversed(int(math.Pow(10, float64(i))))
+		quicksort(&data[i], 0, len(data[i])-1)
+		if !IsSorted(&data[i]) {
+			t.Fatalf("TestSort: %v\n", data[i])
+		}
+	}
+}
+
+func TestIterativeQuicksort(t *testing.T) {
+	data := [5]ints.Ints{}
+	for i := range data {
+		data[i] = ints.Reversed(int(math.Pow(10, float64(i))))
+		iterativeQuicksort(&data[i], 0, len(data[i])-1)
+		if !IsSorted(&data[i]) {
+			t.Fatalf("TestIterativeQuicksort: %v\n", data[i])
 		}
 	}
 }
@@ -134,6 +145,52 @@ func BenchmarkQuicksort(b0 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data[i])
 					quicksort(&cpy, 0, n)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkIterativeQuicksort(b0 *testing.B) {
+	var (
+		data = [5]ints.Ints{}
+		cpy  ints.Ints
+		n    int
+	)
+	for i := range data {
+		n = int(math.Pow10(i))
+		data[i] = ints.Reversed(n)
+		cpy = ints.New(n, n)
+		n--
+		b0.Run(
+			fmt.Sprintf("Iterative QuickSort on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data[i])
+					iterativeQuicksort(&cpy, 0, n)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkGosort(b0 *testing.B) {
+	var (
+		data = [5]ints.Ints{}
+		cpy  ints.Ints
+		n    int
+	)
+	for i := range data {
+		n = int(math.Pow10(i))
+		data[i] = ints.Reversed(n)
+		cpy = ints.New(n, n)
+		n--
+		b0.Run(
+			fmt.Sprintf("Gosort on size 10^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data[i])
+					sort.Ints(cpy)
 				}
 			},
 		)
@@ -227,7 +284,29 @@ func BenchmarkQuicksort2(b0 *testing.B) {
 	}
 }
 
-func BenchmarkGosort(b0 *testing.B) {
+func BenchmarkIterativeQuicksort2(b0 *testing.B) {
+	var (
+		data = [16]ints.Ints{}
+		cpy  ints.Ints
+		n    int
+	)
+	for i := range data {
+		n = i + 1
+		data[i] = ints.Reversed(n)
+		cpy = ints.New(n, n)
+		b0.Run(
+			fmt.Sprintf("Iterative Quicksort on size %d", n),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data[i])
+					iterativeQuicksort(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkGosort2(b0 *testing.B) {
 	var (
 		data = [16]ints.Ints{}
 		cpy  ints.Ints

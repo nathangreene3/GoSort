@@ -71,43 +71,72 @@ func insertionsort(A Interface, a, b int) {
 // quicksort data on the range [a,b].
 func quicksort(A Interface, a, b int) {
 	if a < b {
-		// if b-a < 9 {
-		// 	// Insertionsort
-		// 	for i := a + 1; i <= b; i++ {
-		// 		for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
-		// 			A.Swap(j, j+1)
-		// 		}
-		// 	}
-		// } else {
-		// Median of three
-		c := int(uint(a+b) >> 1) // (a+b)/2
-		if A.Compare(a, b) < 0 {
-			A.Swap(a, b)
-		}
-
-		if A.Compare(c, a) < 0 {
-			A.Swap(a, c)
-		}
-
-		if A.Compare(b, c) < 0 {
-			A.Swap(b, c)
-		}
-
-		// Pivot
-		p := a
-		for i := a + 1; i <= b; i++ {
-			if A.Compare(i, a) < 0 {
-				p++
-				A.Swap(i, p)
-			}
-		}
-
-		A.Swap(a, p)
-
+		medianOfThree(A, a, b)
+		p := pivot(A, a, b)
 		quicksort(A, a, p-1)
 		quicksort(A, p+1, b)
-		// }
 	}
+}
+
+func iterativeQuicksort(A Interface, a, b int) {
+	stack := make([]int, 0, b-a)
+	stack = append(stack, a)
+	stack = append(stack, b)
+	var (
+		n = len(stack)
+		p int
+	)
+	for 0 < n {
+		if a < b {
+			medianOfThree(A, a, b)
+			p = pivot(A, a, b)
+			if b-p < p-a {
+				stack = append(stack, a, p-1)
+				a = p + 1
+			} else {
+				stack = append(stack, p+1, b)
+				b = p - 1
+			}
+
+			n += 2
+		} else {
+			n--
+			b = stack[n]
+			stack = stack[:n]
+
+			n--
+			a = stack[n]
+			stack = stack[:n]
+		}
+	}
+}
+
+func medianOfThree(A Interface, a, b int) {
+	c := int(uint(a+b) >> 1) // (a+b)/2
+	if A.Compare(a, b) < 0 {
+		A.Swap(a, b)
+	}
+
+	if A.Compare(c, a) < 0 {
+		A.Swap(a, c)
+	}
+
+	if A.Compare(b, c) < 0 {
+		A.Swap(b, c)
+	}
+}
+
+func pivot(A Interface, a, b int) int {
+	p := a
+	for i := a + 1; i <= b; i++ {
+		if A.Compare(i, a) < 0 {
+			p++
+			A.Swap(i, p)
+		}
+	}
+
+	A.Swap(a, p)
+	return p
 }
 
 // heapsort data on the range [a,b].
