@@ -71,21 +71,25 @@ func insertionsort(A Interface, a, b int) {
 // quicksort data on the range [a,b].
 func quicksort(A Interface, a, b int) {
 	if a < b {
-		medianOfThree(A, a, b)
-		p := pivot(A, a, b)
-		quicksort(A, a, p-1)
-		quicksort(A, p+1, b)
+		if a < b+9 {
+			insertionsort(A, a, b)
+		} else {
+			medianOfThree(A, a, b)
+			p := pivot(A, a, b)
+			quicksort(A, a, p-1)
+			quicksort(A, p+1, b)
+		}
 	}
 }
 
 func iterativeQuicksort(A Interface, a, b int) {
-	stack := make([]int, 0, b-a)
-	stack = append(stack, a)
-	stack = append(stack, b)
 	var (
-		n = len(stack)
-		p int
+		p     int // Pivot index
+		n     = 2 // Stack size
+		stack = make([]int, 0, b-a)
 	)
+
+	stack = append(stack, a, b)
 	for 0 < n {
 		if a < b {
 			medianOfThree(A, a, b)
@@ -170,7 +174,7 @@ func siftDown(A Interface, a, b int) {
 	}
 }
 
-// shellsort data on the range [a,b]. This is the general case for insertionsort.
+// shellsort data on the range [a,b]. This is the general case for insertionsort, but it is not stable.
 func shellsort(A Interface, a, b int) {
 	// Generate more gaps if needed
 	var (
