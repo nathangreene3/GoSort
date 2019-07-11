@@ -102,10 +102,14 @@ func (A *Ints) Push(x interface{}) {
 	*A = append(*A, x.(int))
 }
 
-// Iterator ...
+// ------------------------------
+// Functional Programming methods
+// ------------------------------
+
+// Iterator performs some action given an index i. Returns true if iteration is to continue and false if iteration is to halt early.
 type Iterator func(i int) bool
 
-// Iterate ...
+// Iterate over range [a,b) and while f(a) is true.
 func Iterate(f Iterator, a, b int) {
 	if a < b && f(a) {
 		Iterate(f, a+1, b)
@@ -165,32 +169,41 @@ func (A Ints) Reduce(f Reducer) int {
 	return v
 }
 
-//
+// FPSort ...
 func (A Ints) FPSort(a, b int) Ints {
-	p := (b + a) / 2
-	if a == p {
-		return A
-	}
 
-	B, C := make(Ints, 0, p), make(Ints, 0, p)
-	// f:=func(i int)bool{
-	// 	if A[i]<A[]
-	// }
-	return B.Append(C)
+	return nil
 }
 
-// Append ...
-func (A Ints) Append(B Ints) Ints {
+// merge ...
+func merge(A, B Ints) Ints {
 	var (
+		a, b int
 		m, n = len(A), len(B)
 		C    = make(Ints, 0, m+n)
 		f    = func(i int) bool {
-			if i < m {
-				C = append(C, A[i])
-			} else {
-				C = append(C, B[i])
+			switch {
+			case a < m:
+				if b < n && B[b] < A[a] {
+					C = append(C, B[b])
+					b++
+				} else {
+					C = append(C, A[a])
+					a++
+				}
+				return true
+			case b < n:
+				if a < m && A[a] < B[b] {
+					C = append(C, A[a])
+					a++
+				} else {
+					C = append(C, B[b])
+					b++
+				}
+				return true
+			default:
+				return false
 			}
-			return true
 		}
 	)
 	Iterate(f, 0, m+n)
