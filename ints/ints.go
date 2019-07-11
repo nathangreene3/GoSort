@@ -101,3 +101,98 @@ func (A *Ints) Pop() interface{} {
 func (A *Ints) Push(x interface{}) {
 	*A = append(*A, x.(int))
 }
+
+// Iterator ...
+type Iterator func(i int) bool
+
+// Iterate ...
+func Iterate(f Iterator, a, b int) {
+	if a < b && f(a) {
+		Iterate(f, a+1, b)
+	}
+}
+
+// Mapper ...
+type Mapper func(a int) int
+
+// Map ...
+func (A Ints) Map(f Mapper) Ints {
+	var (
+		n = len(A)
+		B = make(Ints, 0, n)
+		g = func(i int) bool {
+			B = append(B, f(A[i]))
+			return true
+		}
+	)
+	Iterate(g, 0, n)
+	return B
+}
+
+// Filterer ...
+type Filterer func(a int) bool
+
+// Filter ...
+func (A Ints) Filter(f Filterer) Ints {
+	var (
+		n = len(A)
+		B = make(Ints, 0, n)
+		g = func(i int) bool {
+			a := A[i]
+			if f(a) {
+				B = append(B, a)
+			}
+			return true
+		}
+	)
+	Iterate(g, 0, n)
+	return B
+}
+
+// Reducer ...
+type Reducer func(a, b int) int
+
+// Reduce ...
+func (A Ints) Reduce(f Reducer) int {
+	var (
+		v int
+		g = func(i int) bool {
+			v = f(v, A[i])
+			return true
+		}
+	)
+	Iterate(g, 0, len(A))
+	return v
+}
+
+//
+func (A Ints) FPSort(a, b int) Ints {
+	p := (b + a) / 2
+	if a == p {
+		return A
+	}
+
+	B, C := make(Ints, 0, p), make(Ints, 0, p)
+	// f:=func(i int)bool{
+	// 	if A[i]<A[]
+	// }
+	return B.Append(C)
+}
+
+// Append ...
+func (A Ints) Append(B Ints) Ints {
+	var (
+		m, n = len(A), len(B)
+		C    = make(Ints, 0, m+n)
+		f    = func(i int) bool {
+			if i < m {
+				C = append(C, A[i])
+			} else {
+				C = append(C, B[i])
+			}
+			return true
+		}
+	)
+	Iterate(f, 0, m+n)
+	return C
+}
