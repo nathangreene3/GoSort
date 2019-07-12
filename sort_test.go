@@ -86,6 +86,15 @@ func TestSearch(t *testing.T) {
 	}
 }
 
+func TestFPQuicksort(t *testing.T) {
+	n := 10
+	A := ints.Reversed(n)
+	B := A.FPQuicksort()
+	if !IsSorted(&B) {
+		t.Fatalf("expected sorted, received %v", B)
+	}
+}
+
 func BenchmarkSearch(b0 *testing.B) {
 	var (
 		data = [8]ints.Ints{} // Careful... this is powers of ten
@@ -214,6 +223,29 @@ func BenchmarkGosort(b0 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data[i])
 					sort.Ints(cpy)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkFPQuicksort(b0 *testing.B) {
+	var (
+		data = [8]ints.Ints{}
+		cpy  ints.Ints
+		n    int
+	)
+	for i := range data {
+		n = int(math.Pow(2, float64(i)))
+		data[i] = ints.Reversed(n)
+		cpy = ints.New(n, n)
+		n--
+		b0.Run(
+			fmt.Sprintf("size 2^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data[i])
+					insertionsort(&cpy, 0, n)
 				}
 			},
 		)

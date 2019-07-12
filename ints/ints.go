@@ -169,43 +169,72 @@ func (A Ints) Reduce(f Reducer) int {
 	return v
 }
 
-// FPSort ...
-func (A Ints) FPSort(a, b int) Ints {
+// FPQuicksort ...
+func (A Ints) FPQuicksort() Ints {
+	if n := len(A); 1 < n {
+		var (
+			p    = n >> 1 // n/2
+			B, C = make(Ints, 0, n), make(Ints, 0, n)
+			f    = func(i int) bool {
+				if A[i] <= A[p] {
+					B = append(B, A[i])
+				} else {
+					C = append(C, A[i])
+				}
+				return true
+			}
+		)
 
-	return nil
+		Iterate(f, 0, n)
+		return merge(B.FPQuicksort(), C.FPQuicksort())
+	}
+
+	return A
 }
 
-// merge ...
+// merge A and B into a new, sorted Ints. A and B must be sorted.
 func merge(A, B Ints) Ints {
 	var (
 		a, b int
 		m, n = len(A), len(B)
 		C    = make(Ints, 0, m+n)
-		f    = func(i int) bool {
-			switch {
-			case a < m:
-				if b < n && B[b] < A[a] {
-					C = append(C, B[b])
-					b++
-				} else {
-					C = append(C, A[a])
-					a++
-				}
-				return true
-			case b < n:
-				if a < m && A[a] < B[b] {
-					C = append(C, A[a])
-					a++
-				} else {
-					C = append(C, B[b])
-					b++
-				}
-				return true
-			default:
-				return false
-			}
-		}
 	)
+
+	if m == 0 {
+		if n == 0 {
+			return Ints{}
+		}
+		return B
+	}
+
+	if n == 0 {
+		return A
+	}
+
+	f := func(i int) bool {
+		switch {
+		case a < m:
+			if b < n && B[b] < A[a] {
+				C = append(C, B[b])
+				b++
+			} else {
+				C = append(C, A[a])
+				a++
+			}
+			return true
+		case b < n:
+			if a < m && A[a] < B[b] {
+				C = append(C, A[a])
+				a++
+			} else {
+				C = append(C, B[b])
+				b++
+			}
+			return true
+		default:
+			return false
+		}
+	}
 	Iterate(f, 0, m+n)
 	return C
 }
