@@ -245,7 +245,7 @@ func BenchmarkFPQuicksort(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data[i])
-					insertionsort(&cpy, 0, n)
+					cpy.FPQuicksort()
 				}
 			},
 		)
@@ -377,6 +377,28 @@ func BenchmarkGosort2(b0 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data[i])
 					sort.Ints(cpy)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkFPQuicksort2(b0 *testing.B) {
+	var (
+		data = [16]ints.Ints{}
+		cpy  ints.Ints
+		n    int
+	)
+	for i := range data {
+		n = i + 1
+		data[i] = ints.Reversed(n)
+		cpy = ints.New(n, n)
+		b0.Run(
+			fmt.Sprintf("size %d", n),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data[i])
+					cpy.FPQuicksort()
 				}
 			},
 		)

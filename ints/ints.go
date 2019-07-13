@@ -105,6 +105,11 @@ func (A *Ints) Push(x interface{}) {
 // ------------------------------
 // Functional Programming methods
 // ------------------------------
+// I wanted to know if I could
+// sort things in an FP mannor in
+// Golang, without a for-loop. I
+// don't know why.
+// ------------------------------
 
 // Iterator performs some action given an index i. Returns true if iteration is to continue and false if iteration is to halt early.
 type Iterator func(i int) bool
@@ -173,10 +178,10 @@ func (A Ints) Reduce(f Reducer) int {
 func (A Ints) FPQuicksort() Ints {
 	if n := len(A); 1 < n {
 		var (
-			p    = n >> 1 // n/2
+			p    = median(A[0], A[n/2], A[n-1])
 			B, C = make(Ints, 0, n), make(Ints, 0, n)
 			f    = func(i int) bool {
-				if A[i] <= A[p] {
+				if A[i] <= p {
 					B = append(B, A[i])
 				} else {
 					C = append(C, A[i])
@@ -194,12 +199,7 @@ func (A Ints) FPQuicksort() Ints {
 
 // merge A and B into a new, sorted Ints. A and B must be sorted.
 func merge(A, B Ints) Ints {
-	var (
-		a, b int
-		m, n = len(A), len(B)
-		C    = make(Ints, 0, m+n)
-	)
-
+	m, n := len(A), len(B)
 	if m == 0 {
 		if n == 0 {
 			return Ints{}
@@ -211,30 +211,57 @@ func merge(A, B Ints) Ints {
 		return A
 	}
 
-	f := func(i int) bool {
-		switch {
-		case a < m:
-			if b < n && B[b] < A[a] {
-				C = append(C, B[b])
-				b++
-			} else {
-				C = append(C, A[a])
-				a++
+	var (
+		a, b int
+		C    = make(Ints, 0, m+n)
+		f    = func(i int) bool {
+			switch {
+			case a < m:
+				if b < n && B[b] < A[a] {
+					C = append(C, B[b])
+					b++
+				} else {
+					C = append(C, A[a])
+					a++
+				}
+				return true
+			case b < n:
+				if a < m && A[a] < B[b] {
+					C = append(C, A[a])
+					a++
+				} else {
+					C = append(C, B[b])
+					b++
+				}
+				return true
+			default:
+				return false
 			}
-			return true
-		case b < n:
-			if a < m && A[a] < B[b] {
-				C = append(C, A[a])
-				a++
-			} else {
-				C = append(C, B[b])
-				b++
-			}
-			return true
-		default:
-			return false
 		}
-	}
+	)
 	Iterate(f, 0, m+n)
 	return C
+}
+
+// median ...
+func median(a, b, c int) int {
+	if a < b {
+		if b < c {
+			return b // a < b < c
+		}
+		if a < c {
+			return c // a < c < b
+		}
+		return a // c < a < b
+	}
+
+	if a < c {
+		return a // b < a < c
+	}
+
+	if b < c {
+		return c // b < c < a
+	}
+
+	return b // c < b < a
 }
