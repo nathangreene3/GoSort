@@ -14,7 +14,7 @@ type Interface interface {
 
 // Sort data.
 func Sort(A Interface) {
-	quicksort(A, 0, A.Len()-1)
+	iterativeQuicksort(A, 0, A.Len()-1)
 }
 
 // Stable sort data.
@@ -37,15 +37,10 @@ func IsSorted(A Interface) bool {
 // Search returns the index an item belongs in a list of items and
 // whether or not it was found.
 func Search(A Interface, x interface{}) (int, bool) {
-	var (
-		r int
-		a int
-		b int
-		c = A.Len() - 1
-	)
-	for a <= c {
-		b = int(uint(a+c) >> 1) // (a+c)/2
-		r = A.CompareAt(b, x)
+	var a int
+	for c := A.Len() - 1; a <= c; {
+		b := int(uint(a+c) >> 1) // (a+c)/2
+		r := A.CompareAt(b, x)
 		switch {
 		case r < 0:
 			a = b + 1
@@ -73,6 +68,9 @@ func quicksort(A Interface, a, b int) {
 	if a < b {
 		if a < b+9 {
 			insertionsort(A, a, b)
+			// TODO
+			// } else if a < b+1<<4 {
+			// 	heapsort(A, a, b)
 		} else {
 			medianOfThree(A, a, b)
 			p := pivot(A, a, b)
@@ -82,35 +80,31 @@ func quicksort(A Interface, a, b int) {
 	}
 }
 
+// iterativeQuicksort on the range [a,b].
 func iterativeQuicksort(A Interface, a, b int) {
-	var (
-		p     int // Pivot index
-		n     = 2 // Stack size
-		stack = make([]int, 0, b-a)
-	)
+	if a < b {
+		stack := append(make([]int, 0, b-a+1), a, b)
+		for n := 2; 0 < n; { // n is stack len
+			if a < b {
+				medianOfThree(A, a, b)
+				if p := pivot(A, a, b); b-p < p-a {
+					stack = append(stack, a, p-1)
+					a = p + 1
+				} else {
+					stack = append(stack, p+1, b)
+					b = p - 1
+				}
 
-	stack = append(stack, a, b)
-	for 0 < n {
-		if a < b {
-			medianOfThree(A, a, b)
-			p = pivot(A, a, b)
-			if b-p < p-a {
-				stack = append(stack, a, p-1)
-				a = p + 1
+				n += 2
 			} else {
-				stack = append(stack, p+1, b)
-				b = p - 1
+				n--
+				b = stack[n]
+				stack = stack[:n]
+
+				n--
+				a = stack[n]
+				stack = stack[:n]
 			}
-
-			n += 2
-		} else {
-			n--
-			b = stack[n]
-			stack = stack[:n]
-
-			n--
-			a = stack[n]
-			stack = stack[:n]
 		}
 	}
 }
@@ -146,7 +140,7 @@ func pivot(A Interface, a, b int) int {
 // heapsort data on the range [a,b].
 func heapsort(A Interface, a, b int) {
 	// Heapify A into a max heap
-	for i := b / 2; 0 <= i; i-- {
+	for i := b >> 1; 0 <= i; i-- {
 		siftDown(A, i, b)
 	}
 
@@ -160,9 +154,9 @@ func heapsort(A Interface, a, b int) {
 
 // siftDown corrects the heap on the index range [a,b].
 func siftDown(A Interface, a, b int) {
-	j := int(uint(a)<<1) + 1 // Left child
-	if j <= b {
-		k := j + 1 // Right child
+	// j is left child, k is right child
+	if j := int(uint(a)<<1) + 1; j <= b {
+		k := j + 1
 		if k <= b && A.Compare(j, k) < 0 {
 			j = k
 		}

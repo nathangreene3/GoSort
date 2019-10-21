@@ -178,7 +178,7 @@ func (A Ints) Reduce(f Reducer) int {
 func (A Ints) FPQuicksort() Ints {
 	if n := len(A); 1 < n {
 		var (
-			p    = median(A[0], A[n/2], A[n-1])
+			p    = median(A[0], A[n>>1], A[n-1])
 			B, C = make(Ints, 0, n), make(Ints, 0, n)
 			f    = func(i int) bool {
 				if A[i] <= p {
@@ -200,14 +200,13 @@ func (A Ints) FPQuicksort() Ints {
 // merge A and B into a new, sorted Ints. A and B must be sorted.
 func merge(A, B Ints) Ints {
 	m, n := len(A), len(B)
-	if m == 0 {
+	switch {
+	case m == 0:
 		if n == 0 {
 			return Ints{}
 		}
 		return B
-	}
-
-	if n == 0 {
+	case n == 0:
 		return A
 	}
 
@@ -245,23 +244,21 @@ func merge(A, B Ints) Ints {
 
 // median ...
 func median(a, b, c int) int {
-	if a < b {
-		if b < c {
+	switch {
+	case a < b:
+		switch {
+		case b < c:
 			return b // a < b < c
+		case a < c:
+			return c // a < c <= b
+		default:
+			return a // c <= a < b
 		}
-		if a < c {
-			return c // a < c < b
-		}
-		return a // c < a < b
+	case a < c:
+		return a // b <= a < c
+	case b < c:
+		return c // b < c <= a
+	default:
+		return b // c <= b <= a
 	}
-
-	if a < c {
-		return a // b < a < c
-	}
-
-	if b < c {
-		return c // b < c < a
-	}
-
-	return b // c < b < a
 }
