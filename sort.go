@@ -73,6 +73,38 @@ func quicksort(A Interface, a, b int) {
 	}
 }
 
+// quicksortTail1 ...
+func quicksortTail1(A Interface, a, b int) {
+	// Source: https://www.geeksforgeeks.org/quicksort-tail-call-optimization-reducing-worst-case-space-log-n/
+
+	for a < b {
+		medianOfThree(A, a, b)
+		p := pivot(A, a, b)
+
+		// One recursive call on the lower partition
+		quicksortTail1(A, a, p-1)
+		a = p + 1
+	}
+}
+
+func quicksortTail2(A Interface, a, b int) {
+	// Source: https://www.geeksforgeeks.org/quicksort-tail-call-optimization-reducing-worst-case-space-log-n/
+
+	for a < b {
+		medianOfThree(A, a, b)
+		p := pivot(A, a, b)
+
+		// One recursive call on the smaller partition
+		if p-a < b-p {
+			quicksortTail2(A, a, p-1)
+			a = p + 1
+		} else {
+			quicksortTail2(A, p+1, b)
+			b = p - 1
+		}
+	}
+}
+
 // iterQuicksort on the range [a,b].
 func iterQuicksort(A Interface, a, b int) {
 	if a < b {
@@ -80,7 +112,7 @@ func iterQuicksort(A Interface, a, b int) {
 		for n := 2; 0 < n; { // n is stack len
 			if a < b {
 				medianOfThree(A, a, b)
-				if p := pivot(A, a, b); b-p < p-a { // a+b < 2p
+				if p := pivot(A, a, b); b-p < p-a {
 					stack = append(stack, a, p-1)
 					a = p + 1
 				} else {
@@ -90,12 +122,8 @@ func iterQuicksort(A Interface, a, b int) {
 
 				n += 2
 			} else {
-				n--
-				b = stack[n]
-				stack = stack[:n]
-
-				n--
-				a = stack[n]
+				n -= 2
+				a, b = stack[n], stack[n+1]
 				stack = stack[:n]
 			}
 		}

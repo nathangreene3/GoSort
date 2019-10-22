@@ -78,6 +78,34 @@ func TestQuicksort(t *testing.T) {
 	}
 }
 
+func TestQuicksortTail1(t *testing.T) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+		)
+
+		quicksortTail1(&data, 0, n-1)
+		if !IsSorted(&data) {
+			t.Fatal(data)
+		}
+	}
+}
+
+func TestQuicksortTail2(t *testing.T) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+		)
+
+		quicksortTail2(&data, 0, n-1)
+		if !IsSorted(&data) {
+			t.Fatal(data)
+		}
+	}
+}
+
 func TestSearch(t *testing.T) {
 	var (
 		n    = 1 << maxPow
@@ -237,6 +265,46 @@ func BenchmarkQuicksort(b0 *testing.B) {
 	}
 }
 
+func BenchmarkQuicksortTail1(b0 *testing.B) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+			cpy  = ints.New(n, n)
+		)
+
+		b0.Run(
+			fmt.Sprintf("size 2^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data)
+					quicksortTail1(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkQuicksortTail2(b0 *testing.B) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+			cpy  = ints.New(n, n)
+		)
+
+		b0.Run(
+			fmt.Sprintf("size 2^%d", i+1),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data)
+					quicksortTail2(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
 func BenchmarkShellsort(b0 *testing.B) {
 	for i := 0; i < maxPow; i++ {
 		var (
@@ -388,6 +456,46 @@ func BenchmarkQuicksort2(b0 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
 					quicksort(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkQuicksortTail12(b0 *testing.B) {
+	for i := 0; i < maxIter; i++ {
+		var (
+			n    = i + 1
+			data = ints.Reversed(n)
+			cpy  = ints.New(n, n)
+		)
+
+		b0.Run(
+			fmt.Sprintf("size %d", n),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data)
+					quicksortTail1(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkQuicksortTail22(b0 *testing.B) {
+	for i := 0; i < maxIter; i++ {
+		var (
+			n    = i + 1
+			data = ints.Reversed(n)
+			cpy  = ints.New(n, n)
+		)
+
+		b0.Run(
+			fmt.Sprintf("size %d", n),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data)
+					quicksortTail2(&cpy, 0, n-1)
 				}
 			},
 		)
