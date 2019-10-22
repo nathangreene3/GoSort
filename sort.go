@@ -14,7 +14,7 @@ type Interface interface {
 
 // Sort data.
 func Sort(A Interface) {
-	iterativeQuicksort(A, 0, A.Len()-1)
+	iterQuicksort(A, 0, A.Len()-1)
 }
 
 // Stable sort data.
@@ -66,28 +66,21 @@ func insertionsort(A Interface, a, b int) {
 // quicksort data on the range [a,b].
 func quicksort(A Interface, a, b int) {
 	if a < b {
-		if a < b+9 {
-			insertionsort(A, a, b)
-			// TODO
-			// } else if a < b+1<<4 {
-			// 	heapsort(A, a, b)
-		} else {
-			medianOfThree(A, a, b)
-			p := pivot(A, a, b)
-			quicksort(A, a, p-1)
-			quicksort(A, p+1, b)
-		}
+		medianOfThree(A, a, b)
+		p := pivot(A, a, b)
+		quicksort(A, a, p-1)
+		quicksort(A, p+1, b)
 	}
 }
 
-// iterativeQuicksort on the range [a,b].
-func iterativeQuicksort(A Interface, a, b int) {
+// iterQuicksort on the range [a,b].
+func iterQuicksort(A Interface, a, b int) {
 	if a < b {
 		stack := append(make([]int, 0, b-a+1), a, b)
 		for n := 2; 0 < n; { // n is stack len
 			if a < b {
 				medianOfThree(A, a, b)
-				if p := pivot(A, a, b); b-p < p-a {
+				if p := pivot(A, a, b); b-p < p-a { // a+b < 2p
 					stack = append(stack, a, p-1)
 					a = p + 1
 				} else {
@@ -170,13 +163,11 @@ func siftDown(A Interface, a, b int) {
 
 // shellsort data on the range [a,b]. This is the general case for insertionsort, but it is not stable.
 func shellsort(A Interface, a, b int) {
+	// Why do we do this? TODO: Document why.
 	// Generate more gaps if needed
-	var (
-		gaps = []int{1, 8, 23, 77, 281} // OEIS: A036526, Sedgewick: {1, 8, 23, 77, 281, ...}
-		g    int
-	)
+	gaps := append(make([]int, 0, 5), 1, 8, 23, 77, 281) // OEIS: A036526, Sedgewick: {1, 8, 23, 77, 281, ...}
 	for i := 4.0; ; i++ {
-		g = int(math.Pow(4, i) + 3*math.Pow(2, i-1) + 1)
+		g := int(math.Pow(4, i) + 3*math.Pow(2, i-1) + 1)
 		if b < g+a {
 			break
 		}
@@ -185,7 +176,7 @@ func shellsort(A Interface, a, b int) {
 	}
 
 	for n := len(gaps) - 1; 0 <= n; n-- {
-		g = gaps[n]
+		g := gaps[n]
 		for i := a + g; i <= b; i++ {
 			for j := i - g; 0 <= j && 0 < A.Compare(j, j+g); j -= g {
 				A.Swap(j, j+g)
