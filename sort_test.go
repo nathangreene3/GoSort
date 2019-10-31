@@ -57,7 +57,7 @@ func TestIterativeQuicksort(t *testing.T) {
 			data = ints.Reversed(n)
 		)
 
-		iterQuicksort(&data, 0, n-1)
+		quicksortIter(&data, 0, n-1)
 		if !IsSorted(&data) {
 			t.Fatalf("\ni = %d\nexpected sorted\nreceived: %v\n", i, data)
 		}
@@ -238,7 +238,7 @@ func BenchmarkIterativeQuicksort(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					iterQuicksort(&cpy, 0, n-1)
+					quicksortIter(&cpy, 0, n-1)
 				}
 			},
 		)
@@ -435,7 +435,7 @@ func BenchmarkIterativeQuicksort2(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					iterQuicksort(&cpy, 0, n-1)
+					quicksortIter(&cpy, 0, n-1)
 				}
 			},
 		)

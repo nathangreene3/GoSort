@@ -14,7 +14,7 @@ type Interface interface {
 // Heapify sets up an Interface as a max heap.
 func Heapify(h Interface) {
 	n := h.Len() - 1
-	for i := n / 2; 0 <= i; i-- {
+	for i := n >> 1; 0 <= i; i-- {
 		siftDown(h, i, n)
 	}
 }

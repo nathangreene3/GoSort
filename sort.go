@@ -14,7 +14,7 @@ type Interface interface {
 
 // Sort data.
 func Sort(A Interface) {
-	iterQuicksort(A, 0, A.Len()-1)
+	quicksortIter(A, 0, A.Len()-1)
 }
 
 // Stable sort data.
@@ -51,6 +51,13 @@ func Search(A Interface, x interface{}) (int, bool) {
 		}
 	}
 
+	// If A wasn't sorted, iterate through all of A
+	for a = 0; a < A.Len(); a++ {
+		if A.CompareAt(a, x) == 0 {
+			return a, true
+		}
+	}
+
 	return a, false
 }
 
@@ -79,9 +86,9 @@ func quicksortTail1(A Interface, a, b int) {
 
 	for a < b {
 		medianOfThree(A, a, b)
-		p := pivot(A, a, b)
 
 		// One recursive call on the lower partition
+		p := pivot(A, a, b)
 		quicksortTail1(A, a, p-1)
 		a = p + 1
 	}
@@ -92,10 +99,9 @@ func quicksortTail2(A Interface, a, b int) {
 
 	for a < b {
 		medianOfThree(A, a, b)
-		p := pivot(A, a, b)
 
 		// One recursive call on the smaller partition
-		if p-a < b-p {
+		if p := pivot(A, a, b); p-a < b-p {
 			quicksortTail2(A, a, p-1)
 			a = p + 1
 		} else {
@@ -105,8 +111,8 @@ func quicksortTail2(A Interface, a, b int) {
 	}
 }
 
-// iterQuicksort on the range [a,b].
-func iterQuicksort(A Interface, a, b int) {
+// quicksortIter on the range [a,b].
+func quicksortIter(A Interface, a, b int) {
 	if a < b {
 		stack := append(make([]int, 0, b-a+1), a, b)
 		for n := 2; 0 < n; { // n is stack len
@@ -130,6 +136,8 @@ func iterQuicksort(A Interface, a, b int) {
 	}
 }
 
+// medianOfThree pushes the median value on the range [a,b] to the index of a,
+// the smallest value to the index (a+b)/2, and the largest value to the index b.
 func medianOfThree(A Interface, a, b int) {
 	c := int(uint(a+b) >> 1) // (a+b)/2
 	if A.Compare(a, b) < 0 {
@@ -145,6 +153,9 @@ func medianOfThree(A Interface, a, b int) {
 	}
 }
 
+// pivot returns the index on the range [a,b] such that all values smaller than A
+// [p] are on the range [a,p-1] and all the values larger than A[p] are on the
+// range [p+1,b]. The pivot value is A[0], which will have index p when finished.
 func pivot(A Interface, a, b int) int {
 	p := a
 	for i := a + 1; i <= b; i++ {
@@ -189,7 +200,8 @@ func siftDown(A Interface, a, b int) {
 	}
 }
 
-// shellsort data on the range [a,b]. This is the general case for insertionsort, but it is not stable.
+// shellsort data on the range [a,b]. This is the general case for insertionsort,
+// but it is not stable.
 func shellsort(A Interface, a, b int) {
 	// Why do we do this? TODO: Document why.
 	// Generate more gaps if needed
