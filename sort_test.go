@@ -9,14 +9,19 @@ import (
 )
 
 const (
-	maxPow  = 8
+	// maxIter is the maximum value to test linear changes in size
 	maxIter = 16
+
+	// maxPow is the maximum power of two to test changes in magnitude of the size
+	maxPow = 8
 )
 
 func TestFPQuicksort(t *testing.T) {
-	n := 10
-	A := ints.Reversed(n)
-	B := A.FPQuicksort()
+	var (
+		A = ints.Reversed(256)
+		B = A.FPQuicksort()
+	)
+
 	if !IsSorted(&B) {
 		t.Fatalf("expected sorted, received %v", B)
 	}
@@ -50,7 +55,21 @@ func TestInsertionsort(t *testing.T) {
 	}
 }
 
-func TestIterativeQuicksort(t *testing.T) {
+func TestQuicksort(t *testing.T) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+		)
+
+		quicksortIter(&data, 0, n-1)
+		if !IsSorted(&data) {
+			t.Fatal(data)
+		}
+	}
+}
+
+func TestQuicksortIter(t *testing.T) {
 	for i := 0; i < maxPow; i++ {
 		var (
 			n    = 1 << uint(i)
@@ -64,44 +83,33 @@ func TestIterativeQuicksort(t *testing.T) {
 	}
 }
 
-func TestQuicksort(t *testing.T) {
+func TestQuicksortTail(t *testing.T) {
 	for i := 0; i < maxPow; i++ {
 		var (
 			n    = 1 << uint(i)
 			data = ints.Reversed(n)
 		)
 
-		quicksort(&data, 0, n-1)
+		quicksortTail(&data, 0, n-1)
 		if !IsSorted(&data) {
 			t.Fatal(data)
 		}
 	}
 }
 
-func TestQuicksortTail1(t *testing.T) {
+func TestReverse(t *testing.T) {
 	for i := 0; i < maxPow; i++ {
 		var (
 			n    = 1 << uint(i)
 			data = ints.Reversed(n)
+			exp  = *data.Copy()
 		)
 
-		quicksortTail1(&data, 0, n-1)
-		if !IsSorted(&data) {
-			t.Fatal(data)
-		}
-	}
-}
-
-func TestQuicksortTail2(t *testing.T) {
-	for i := 0; i < maxPow; i++ {
-		var (
-			n    = 1 << uint(i)
-			data = ints.Reversed(n)
-		)
-
-		quicksortTail2(&data, 0, n-1)
-		if !IsSorted(&data) {
-			t.Fatal(data)
+		Reverse(&data)
+		for i := 0; i < n; i++ {
+			if data[i] != exp[i] {
+				t.Fatalf("\nexpected %v\nreceived %v\n", exp, data)
+			}
 		}
 	}
 }
@@ -112,8 +120,8 @@ func TestSearch(t *testing.T) {
 		data = ints.Sorted(n)
 	)
 
-	for i := range data {
-		if index, found := Search(&data, i); i != index || !found {
+	for i, v := range data {
+		if index, found := Search(&data, v); i != index || !found {
 			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", i, true, index, found)
 		}
 	}
@@ -154,7 +162,7 @@ func BenchmarkFPQuicksort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
@@ -174,7 +182,7 @@ func BenchmarkGosort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
@@ -194,7 +202,7 @@ func BenchmarkHeapsort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
@@ -214,31 +222,11 @@ func BenchmarkInsertionsort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
 					insertionsort(&cpy, 0, n-1)
-				}
-			},
-		)
-	}
-}
-
-func BenchmarkIterativeQuicksort(b0 *testing.B) {
-	for i := 0; i < maxPow; i++ {
-		var (
-			n    = 1 << uint(i)
-			data = ints.Reversed(n)
-			cpy  = ints.New(n, n)
-		)
-
-		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
-			func(b1 *testing.B) {
-				for j := 0; j < b1.N; j++ {
-					copy(cpy, data)
-					quicksortIter(&cpy, 0, n-1)
 				}
 			},
 		)
@@ -254,7 +242,7 @@ func BenchmarkQuicksort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
@@ -265,7 +253,7 @@ func BenchmarkQuicksort(b0 *testing.B) {
 	}
 }
 
-func BenchmarkQuicksortTail1(b0 *testing.B) {
+func BenchmarkQuicksortIter(b0 *testing.B) {
 	for i := 0; i < maxPow; i++ {
 		var (
 			n    = 1 << uint(i)
@@ -274,18 +262,18 @@ func BenchmarkQuicksortTail1(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					quicksortTail1(&cpy, 0, n-1)
+					quicksortIter(&cpy, 0, n-1)
 				}
 			},
 		)
 	}
 }
 
-func BenchmarkQuicksortTail2(b0 *testing.B) {
+func BenchmarkQuicksortTail(b0 *testing.B) {
 	for i := 0; i < maxPow; i++ {
 		var (
 			n    = 1 << uint(i)
@@ -294,11 +282,11 @@ func BenchmarkQuicksortTail2(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					quicksortTail2(&cpy, 0, n-1)
+					quicksortTail(&cpy, 0, n-1)
 				}
 			},
 		)
@@ -314,7 +302,7 @@ func BenchmarkShellsort(b0 *testing.B) {
 		)
 
 		b0.Run(
-			fmt.Sprintf("size 2^%d", i+1),
+			fmt.Sprintf("size %d", n),
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
@@ -422,26 +410,6 @@ func BenchmarkInsertionsort2(b0 *testing.B) {
 	}
 }
 
-func BenchmarkIterativeQuicksort2(b0 *testing.B) {
-	for i := 0; i < maxIter; i++ {
-		var (
-			n    = i + 1
-			data = ints.Reversed(n)
-			cpy  = ints.New(n, n)
-		)
-
-		b0.Run(
-			fmt.Sprintf("size %d", n),
-			func(b1 *testing.B) {
-				for j := 0; j < b1.N; j++ {
-					copy(cpy, data)
-					quicksortIter(&cpy, 0, n-1)
-				}
-			},
-		)
-	}
-}
-
 func BenchmarkQuicksort2(b0 *testing.B) {
 	for i := 0; i < maxIter; i++ {
 		var (
@@ -462,7 +430,7 @@ func BenchmarkQuicksort2(b0 *testing.B) {
 	}
 }
 
-func BenchmarkQuicksortTail12(b0 *testing.B) {
+func BenchmarkQuicksortIter2(b0 *testing.B) {
 	for i := 0; i < maxIter; i++ {
 		var (
 			n    = i + 1
@@ -475,14 +443,14 @@ func BenchmarkQuicksortTail12(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					quicksortTail1(&cpy, 0, n-1)
+					quicksortIter(&cpy, 0, n-1)
 				}
 			},
 		)
 	}
 }
 
-func BenchmarkQuicksortTail22(b0 *testing.B) {
+func BenchmarkQuicksortTail2(b0 *testing.B) {
 	for i := 0; i < maxIter; i++ {
 		var (
 			n    = i + 1
@@ -495,7 +463,7 @@ func BenchmarkQuicksortTail22(b0 *testing.B) {
 			func(b1 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
-					quicksortTail2(&cpy, 0, n-1)
+					quicksortTail(&cpy, 0, n-1)
 				}
 			},
 		)
@@ -521,3 +489,7 @@ func BenchmarkShellsort2(b0 *testing.B) {
 		)
 	}
 }
+
+// ------------------------------------------------------------------
+// Benchmark ...
+// ------------------------------------------------------------------

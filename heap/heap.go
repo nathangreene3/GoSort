@@ -1,18 +1,16 @@
 package heap
 
-import (
-	"github.com/nathangreene3/sort"
-)
+import "github.com/nathangreene3/sort"
 
-// Interface defines the context for implementing a heap.
-type Interface interface {
-	sort.Interface
+// Heapable defines the context for implementing a heap.
+type Heapable interface {
+	sort.Sortable
 	Push(x interface{})
 	Pop() interface{}
 }
 
-// Heapify sets up an Interface as a max heap.
-func Heapify(h Interface) {
+// Heapify sets up an Heapable as a max heap.
+func Heapify(h Heapable) {
 	n := h.Len() - 1
 	for i := n >> 1; 0 <= i; i-- {
 		siftDown(h, i, n)
@@ -20,13 +18,13 @@ func Heapify(h Interface) {
 }
 
 // Push an item onto the heap.
-func Push(h Interface, x interface{}) {
+func Push(h Heapable, x interface{}) {
 	h.Push(x)
 	siftUp(h, h.Len()-1)
 }
 
 // Pop the top of the heap. The item will have the lowest value of the heap.
-func Pop(h Interface) interface{} {
+func Pop(h Heapable) interface{} {
 	n := h.Len() - 1
 	h.Swap(0, n)
 	siftDown(h, 0, n-1)
@@ -34,7 +32,7 @@ func Pop(h Interface) interface{} {
 }
 
 // siftUp corrects the heap from i up.
-func siftUp(h Interface, i int) {
+func siftUp(h Heapable, i int) {
 	if 0 < i {
 		p := int(uint(i-1) >> 1) // Parent index: (i-1)/2
 		if 0 < h.Compare(p, i) {
@@ -45,12 +43,12 @@ func siftUp(h Interface, i int) {
 }
 
 // siftDown corrects the heap from i down to n.
-func siftDown(h Interface, i, n int) {
-	j := int(uint(i)<<1) + 1 // Left child index
-	if j <= n {
-		k := j + 1 // Right child index
+func siftDown(h Heapable, i, n int) {
+	// j is initially left child, k is right child
+	if j := int(uint(i)<<1) + 1; j <= n {
+		k := j + 1
 		if k <= n && h.Compare(j, k) < 0 {
-			j = k
+			j = k // right child is larger
 		}
 
 		if h.Compare(i, j) < 0 {
@@ -61,7 +59,7 @@ func siftDown(h Interface, i, n int) {
 }
 
 // Sort the heap.
-func Sort(h Interface) {
+func Sort(h Heapable) {
 	Heapify(h)
 	for n := h.Len() - 1; 0 < n; {
 		h.Swap(0, n)
