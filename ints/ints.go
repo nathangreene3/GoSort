@@ -55,8 +55,8 @@ func (A *Ints) Compare(i, j int) int {
 	}
 }
 
-// CompareAt returns the comparison of A[i] to an integer.
-func (A *Ints) CompareAt(i int, x interface{}) int {
+// CompareTo returns the comparison of A[i] to an integer.
+func (A *Ints) CompareTo(i int, x interface{}) int {
 	switch {
 	case (*A)[i] < x.(int):
 		return -1
@@ -186,6 +186,7 @@ func (A Ints) FPQuicksort() Ints {
 				} else {
 					C = append(C, A[i])
 				}
+
 				return true
 			}
 		)
