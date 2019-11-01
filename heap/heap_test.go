@@ -8,9 +8,12 @@ import (
 	"github.com/nathangreene3/sort/ints"
 )
 
-var (
+const (
+	// maxIter is the maximum value to test linear changes in size
 	maxIter = 16
-	maxPow  = 8
+
+	// maxPow is the maximum power of two to test changes in magnitude of the size
+	maxPow = 8
 )
 
 func TestHeap(t *testing.T) {

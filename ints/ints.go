@@ -102,16 +102,15 @@ func (A *Ints) Push(x interface{}) {
 	*A = append(*A, x.(int))
 }
 
-// ------------------------------
+// ------------------------------------------------------------------------------
 // Functional Programming methods
-// ------------------------------
-// I wanted to know if I could
-// sort things in an FP mannor in
-// Golang, without a for-loop. I
-// don't know why.
-// ------------------------------
+// ------------------------------------------------------------------------------
+// I wanted to know if I could sort things in an FP mannor in Golang, without a
+// for-loop. I don't know why.
+// ------------------------------------------------------------------------------
 
-// Iterator performs some action given an index i. Returns true if iteration is to continue and false if iteration is to halt early.
+// Iterator performs some action given an index i. Returns true if iteration is
+// to continue and false if iteration is to halt early.
 type Iterator func(i int) bool
 
 // Iterate over range [a,b) and while f(a) is true.
@@ -147,8 +146,7 @@ func (A Ints) Filter(f Filterer) Ints {
 		n = len(A)
 		B = make(Ints, 0, n)
 		g = func(i int) bool {
-			a := A[i]
-			if f(a) {
+			if a := A[i]; f(a) {
 				B = append(B, a)
 			}
 			return true
@@ -224,6 +222,7 @@ func merge(A, B Ints) Ints {
 					C = append(C, A[a])
 					a++
 				}
+
 				return true
 			case b < n:
 				if a < m && A[a] < B[b] {
@@ -233,6 +232,7 @@ func merge(A, B Ints) Ints {
 					C = append(C, B[b])
 					b++
 				}
+
 				return true
 			default:
 				return false

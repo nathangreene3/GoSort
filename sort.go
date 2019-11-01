@@ -10,26 +10,6 @@ type Sortable interface {
 	Swap(i, j int)
 }
 
-// Reverse sort data.
-func Reverse(A Sortable) {
-	n := A.Len() - 1
-	quicksortIter(A, 0, n)
-	for i := 0; i < n; i++ {
-		A.Swap(i, n)
-		n--
-	}
-}
-
-// Sort data.
-func Sort(A Sortable) {
-	quicksortIter(A, 0, A.Len()-1)
-}
-
-// Stable sort data.
-func Stable(A Sortable) {
-	insertionsort(A, 0, A.Len()-1)
-}
-
 // IsSorted determines if data is sorted.
 func IsSorted(A Sortable) bool {
 	n := A.Len() - 1
@@ -42,8 +22,18 @@ func IsSorted(A Sortable) bool {
 	return true
 }
 
+// Reverse sort data.
+func Reverse(A Sortable) {
+	n := A.Len() - 1
+	quicksortIter(A, 0, n)
+	for i := 0; i < n; i++ {
+		A.Swap(i, n)
+		n--
+	}
+}
+
 // Search returns the index an item belongs in a list of items and
-// whether or not it was found.
+// whether or not it was found. Assumes the list is already sorted.
 func Search(A Sortable, x interface{}) (int, bool) {
 	var a int
 	for c := A.Len() - 1; a <= c; {
@@ -55,11 +45,24 @@ func Search(A Sortable, x interface{}) (int, bool) {
 		case 0 < r:
 			c = b - 1
 		default:
-			return b, true
+			for ; 0 < b && A.Compare(b-1, b) == 0; b-- {
+			}
+
+			return b, true // x is equal to A[b]
 		}
 	}
 
-	return a, false
+	return a, false // x belongs at a, but is not equal to A[a]
+}
+
+// Sort data.
+func Sort(A Sortable) {
+	quicksortIter(A, 0, A.Len()-1)
+}
+
+// Stable sort data.
+func Stable(A Sortable) {
+	insertionsort(A, 0, A.Len()-1)
 }
 
 // insertionsort data on the range [a,b].
@@ -132,7 +135,7 @@ func medianOfThree(A Sortable, a, b int) {
 		A.Swap(a, b)
 	}
 
-	if A.Compare(c, a) < 0 {
+	if 0 < A.Compare(a, c) {
 		A.Swap(a, c)
 	}
 

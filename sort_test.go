@@ -2,6 +2,7 @@ package sort
 
 import (
 	"fmt"
+	"math/rand"
 	"sort"
 	"testing"
 
@@ -115,23 +116,128 @@ func TestReverse(t *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	var (
-		n    = 1 << maxPow
-		data = ints.Sorted(n)
-	)
+	{
+		var (
+			n    = 1 << maxPow
+			data = ints.Random(n)
+		)
 
-	for i, v := range data {
-		if index, found := Search(&data, v); i != index || !found {
-			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", i, true, index, found)
+		// Test each value against it's known index i
+		Sort(&data) // A = [0 1 2 ... n-1]
+		for i, v := range data {
+			index, found := Search(&data, v)
+			if i != index || !found {
+				t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", i, true, index, found)
+			}
+
+			// Compare to Go's search
+			if expected := sort.Search(n, func(j int) bool { return v <= data[j] }); expected != index {
+				t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, true, index, found)
+			}
+		}
+
+		// Test value that precedes all of data
+		index, found := Search(&data, -1)
+		if index != 0 || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", 0, false, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(n, func(j int) bool { return -1 <= data[j] }); expected != index || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+
+		// Test value that follows all of data
+		index, found = Search(&data, n)
+		if index != n || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", 5, false, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(n, func(j int) bool { return n <= data[j] }); expected != index || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
 		}
 	}
 
-	if index, found := Search(&data, n); index != n || found {
-		t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", 5, false, index, found)
+	{
+		var (
+			n    = 1 << maxPow
+			data = make(ints.Ints, 0, n)
+		)
+
+		// Test on data that is not a permutation of [0 1 2 ... n-1]
+		for i := 0; i < n; i++ {
+			data = append(data, rand.Intn(10)) // Each item is on range [0,10)
+		}
+
+		// Test value of -1 that precedes all of data
+		var (
+			expected     int
+			target       = -1
+			index, found = Search(&data, target)
+		)
+
+		if index != expected || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(n, func(j int) bool { return target <= data[j] }); expected != index || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+
+		// Test value of 10 that follows all of data
+		target = 10
+		expected = data.Len()
+		index, found = Search(&data, target)
+		if index != expected || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(n, func(j int) bool { return target <= data[j] }); expected != index || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
 	}
 
-	if index, found := Search(&data, -1); index != 0 || found {
-		t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", 0, false, index, found)
+	{
+		// Test searching for value not in sorted data
+		// Test value of 3 that should have index 2
+		var (
+			data         = ints.Ints{1, 2, 4, 5}
+			expected     = 2
+			target       = 3
+			index, found = Search(&data, target)
+		)
+
+		if index != expected || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(len(data), func(j int) bool { return target <= data[j] }); expected != index || found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, false, index, found)
+		}
+	}
+
+	{
+		// Test searching for value not in sorted data
+		// Test value of 2 that should have index 1
+		var (
+			data         = ints.Ints{1, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+			expected     = 1
+			target       = data[expected]
+			index, found = Search(&data, target)
+		)
+
+		if index != expected || !found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, true, index, found)
+		}
+
+		// Compare to Go's search
+		if expected := sort.Search(len(data), func(j int) bool { return target <= data[j] }); expected != index || !found {
+			t.Fatalf("\nexpected (%d,%t)\nreceived (%d,%t)", expected, true, index, found)
+		}
 	}
 }
 
