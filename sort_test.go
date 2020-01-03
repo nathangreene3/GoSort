@@ -56,6 +56,20 @@ func TestInsertionsort(t *testing.T) {
 	}
 }
 
+func TestMIsort(t *testing.T) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+		)
+
+		misort(&data, 0, n-1)
+		if !IsSorted(&data) {
+			t.Fatal(data)
+		}
+	}
+}
+
 func TestQuicksort(t *testing.T) {
 	for i := 0; i < maxPow; i++ {
 		var (
@@ -333,6 +347,26 @@ func BenchmarkInsertionsort(b0 *testing.B) {
 				for j := 0; j < b1.N; j++ {
 					copy(cpy, data)
 					insertionsort(&cpy, 0, n-1)
+				}
+			},
+		)
+	}
+}
+
+func BenchmarkMIsort(b0 *testing.B) {
+	for i := 0; i < maxPow; i++ {
+		var (
+			n    = 1 << uint(i)
+			data = ints.Reversed(n)
+			cpy  = ints.New(n, n)
+		)
+
+		b0.Run(
+			fmt.Sprintf("size %d", n),
+			func(b1 *testing.B) {
+				for j := 0; j < b1.N; j++ {
+					copy(cpy, data)
+					misort(&cpy, 0, n-1)
 				}
 			},
 		)

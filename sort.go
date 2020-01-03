@@ -74,6 +74,16 @@ func insertionsort(A Sortable, a, b int) {
 	}
 }
 
+func misort(A Sortable, a, b int) {
+	for size := 1; size+a <= b; size <<= 1 {
+		for i := a + size; i <= b; i++ {
+			for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
+				A.Swap(j, j+1)
+			}
+		}
+	}
+}
+
 // quicksort data on the range [a,b].
 func quicksort(A Sortable, a, b int) {
 	if a < b {
