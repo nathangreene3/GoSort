@@ -74,11 +74,20 @@ func insertionsort(A Sortable, a, b int) {
 	}
 }
 
+// misort data on the range [a,b].
 func misort(A Sortable, a, b int) {
 	for size := 1; size+a <= b; size <<= 1 {
-		for i := a + size; i <= b; i++ {
-			for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
-				A.Swap(j, j+1)
+		// for i := a + size; i <= b; i++ {
+		// 	for j := i - 1; 0 <= j && 0 < A.Compare(j, j+1); j-- {
+		// 		A.Swap(j, j+1)
+		// 	}
+		// }
+		twoSize := size << 1
+		for i := a; i <= b; i += twoSize {
+			for j := i + size; j <= b && j <= i+twoSize; j++ {
+				for k := j - 1; 0 <= k && 0 < A.Compare(k, k+1); k-- {
+					A.Swap(k, k+1)
+				}
 			}
 		}
 	}
